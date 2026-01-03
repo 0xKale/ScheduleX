@@ -5,22 +5,26 @@
 
 namespace hooks
 {
-    inline float GetTargetFOV(float originalGameFov)
-    {
-        if (vars::bCustomFieldOfView)
-            return vars::fFieldOfView;
-
-        return originalGameFov; 
-    }
     typedef void(__fastcall* tSetfieldOfView)(void* CameraMain, float fov);
     inline tSetfieldOfView oSetfieldOfView = nullptr;
 
     inline void __fastcall hkSetfieldOfView(void* CameraMain, float fov)
     {
-        if (!CameraMain)
-            return;
-        float finalFov = GetTargetFOV(fov);
-        oSetfieldOfView(CameraMain, finalFov);
+        if (!CameraMain) return;
+
+        if (vars::bCustomFieldOfView)
+            return oSetfieldOfView(CameraMain, vars::fFieldOfView);
+
+        return oSetfieldOfView(CameraMain, fov);
+    }
+
+    typedef int(__fastcall* tGetStackLimit)(void* __this);
+    inline tGetStackLimit oGetStackLimit = nullptr;
+    inline int __fastcall hkGetStackLimit(void* __this)
+    {
+        if (vars::bCustomStackLimit)
+            return vars::iStackLimit;
+        return oGetStackLimit(__this);
     }
 
     inline void Init()
@@ -39,6 +43,11 @@ namespace hooks
         if (MH_CreateHook((void*)fovAddress, &hkSetfieldOfView, (LPVOID*)&oSetfieldOfView) == MH_OK)
         {
             MH_EnableHook((void*)fovAddress);
+        }
+        uintptr_t stackAddr = offsets::GameAssembly + offsets::localplayer::GetStackLimit;
+        if (MH_CreateHook((void*)stackAddr, &hkGetStackLimit, (LPVOID*)&oGetStackLimit) == MH_OK)
+        {
+            MH_EnableHook((void*)stackAddr);
         }
     }
 }

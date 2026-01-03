@@ -12,11 +12,18 @@ namespace gui
         ImGui::Separator();
 
         ImGui::Checkbox("Custom FOV", &vars::bCustomFieldOfView);
-
         if (vars::bCustomFieldOfView)
         {
             ImGui::Indent();
             ImGui::SliderFloat("FOV Amount", &vars::fFieldOfView, 60.0f, 120.0f, "%.1f");
+            ImGui::Unindent();
+        }
+        ImGui::Separator();
+        ImGui::Checkbox("Custom Stack Limit", &vars::bCustomStackLimit);
+        if (vars::bCustomStackLimit)
+        {
+            ImGui::Indent();
+            ImGui::SliderInt("Max Stack Size", &vars::iStackLimit, 20, 100);
             ImGui::Unindent();
         }
     }
