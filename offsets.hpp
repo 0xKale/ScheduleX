@@ -9,7 +9,7 @@ namespace offsets
 
     namespace localplayer
     {
-        inline uintptr_t SetfieldOfView = 0x2C841A0; // UnityEngine.Camera$$set_fieldOfView
-        inline uintptr_t GetStackLimit = 0x997CC0; // ScheduleOne.ItemFramework.ItemInstance$$get_StackLimit
+        inline uintptr_t SetfieldOfView = 0x2C841A0; // FOV - UnityEngine.Camera$$set_fieldOfVie
+        inline uintptr_t GetStackLimit = 0x997CC0; // Stack Limit - ScheduleOne.ItemFramework.ItemInstance$$get_StackLimit
     }
 }
