@@ -27,12 +27,9 @@ namespace gui
 
     inline void Render()
     {
-        // Toggle Logic
-        if (GetAsyncKeyState(VK_HOME) & 1 || GetAsyncKeyState(VK_INSERT) & 1)
+		if (GetAsyncKeyState(VK_HOME) & 1 || GetAsyncKeyState(VK_INSERT) & 1) // insert and home key to toggle menu
         {
             vars::bShowMenu = !vars::bShowMenu;
-
-            // KEY FIX: Force the state immediately when toggled
             if (vars::bShowMenu) {
                 hooks::ForceUnlock();
             }
@@ -56,6 +53,40 @@ namespace gui
                 {
                     RenderQoLTab();
                     ImGui::EndTabItem();
+                }
+				if (ImGui::BeginTabBar("ESPTabBar"))
+                {
+                    if (ImGui::BeginTabItem("ESP"))
+                    {
+                        ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
+
+                        if (vars::bEspEnabled)
+                        {
+                            ImGui::Indent();
+                            ImGui::Checkbox("Show Players", &vars::bPlayerEsp);
+                            ImGui::Checkbox("Show NPCs", &vars::bNpcEsp); // <--- ADD THIS
+                            ImGui::Unindent();
+                        }
+                        ImGui::Checkbox("Draw Boxes", &vars::bDrawBox);
+                        ImGui::Separator();
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "--- DEBUG INFO ---");
+
+                        // 1. Check if we found the list
+                        if (vars::pPlayerList)
+                        {
+                            // 2. Read the size directly from memory (Offset 0x18 is standard for C# Lists)
+                            int count = *(int*)((uintptr_t)vars::pPlayerList + 0x18);
+
+                            ImGui::Text("List Address: %p", vars::pPlayerList);
+                            ImGui::Text("Players Detected: %d", count);
+                        }
+                        else
+                        {
+                            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Searching for PlayerList...");
+                        }
+                        ImGui::EndTabItem();
+                    }
+                    ImGui::EndTabBar();
                 }
                 ImGui::EndTabBar();
             }

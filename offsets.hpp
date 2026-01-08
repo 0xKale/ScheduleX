@@ -9,8 +9,8 @@ namespace offsets
 
     namespace localplayer
     {
-        inline uintptr_t SetfieldOfView = 0x2C841A0;
-        inline uintptr_t GetStackLimit = 0x997CC0;
+        inline uintptr_t SetfieldOfView = 0x2C841A0; // FOV - UnityEngine.Camera$$set_fieldOfVie
+        inline uintptr_t GetStackLimit = 0x997CC0;// Stack Limit - ScheduleOne.ItemFramework.ItemInstance$$get_StackLimit
     }
     namespace debug
     {
@@ -18,7 +18,23 @@ namespace offsets
     }
     namespace unity
     {
-        inline uintptr_t SetLockState = 0x2CA5710;
-        inline uintptr_t SetVisible = 0x2CA5750;
+		inline uintptr_t SetLockState = 0x2CA5710; // Cursor Lock - UnityEngine.Cursor$$set_lockState
+		inline uintptr_t SetVisible = 0x2CA5750; // Cursor Visible - UnityEngine.Cursor$$set_visible
+        inline uintptr_t WorldToScreenPoint = 0x2C82EF0; // UnityEngine.Camera::WorldToScreenPoint
+        inline uintptr_t GetTransform = 0x2CBA530; // Player Transform - UnityEngine.Component$$get_transform
+        inline uintptr_t GetPosition = 0x2CCEAD0; // Transform Position - UnityEngine.Transform$$get_position
+		inline uintptr_t GetName = 0x2CC20E0; // GameObject Name - UnityEngine.GameObject$$get_name
+    }
+    namespace player
+    {
+		inline uintptr_t PlayerUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update
+
+
+		
+        inline uintptr_t StaticPlayerList = 0x20;// Player List offset
+	}
+    namespace npc
+    {
+		inline uintptr_t MovementUpdate = 0x7254D0; // NPC Movement Update - NPC.NPCModel$$MovementUpdate
     }
 }

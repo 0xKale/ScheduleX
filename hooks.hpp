@@ -3,20 +3,21 @@
 
 namespace hooks
 {
-    // --- Cursor Logic ---
+
+    // cursor shit
     typedef void(__fastcall* tSetLockState)(int value, void* method);
     inline tSetLockState oSetLockState = nullptr;
 
     inline void __fastcall hkSetLockState(int value, void* method)
     {
-        vars::iLastGameLockState = value; // Capture what the game WANTS to do
-
+        vars::iLastGameLockState = value;
         if (vars::bShowMenu) {
-            return oSetLockState(0, method); // Force Unlock (0 = None)
+            return oSetLockState(0, method); // Force Unlock
         }
-        return oSetLockState(value, method); // Allow normal behavior
+        return oSetLockState(value, method);
     }
 
+    // cursor visible
     typedef void(__fastcall* tSetVisible)(bool value, void* method);
     inline tSetVisible oSetVisible = nullptr;
 
@@ -28,22 +29,14 @@ namespace hooks
         }
         return oSetVisible(value, method);
     }
+	// il2cpp threading - getname fix
+    typedef void* (*t_il2cpp_domain_get)();
+    inline t_il2cpp_domain_get il2cpp_domain_get = nullptr;
 
-    // --- Helper to Force Cursor State Immediately ---
-    inline void ForceUnlock()
-    {
-        // Call this when opening the menu to apply settings INSTANTLY
-        if (oSetLockState) oSetLockState(0, nullptr);
-        if (oSetVisible) oSetVisible(true, nullptr);
-    }
+    typedef void* (*t_il2cpp_thread_attach)(void* domain);
+    inline t_il2cpp_thread_attach il2cpp_thread_attach = nullptr;
 
-    inline void CursorHandler() // Restore function
-    {
-        if (oSetLockState) oSetLockState(vars::iLastGameLockState, nullptr);
-        if (oSetVisible) oSetVisible(vars::bLastCursorVisible, nullptr);
-    }
-
-    // --- Game Logic Hooks ---
+    // debug
     typedef bool(__fastcall* tDebugValue)(void* __this);
     inline tDebugValue oDebugValue = nullptr;
 
@@ -53,21 +46,122 @@ namespace hooks
         return vars::bDebug ? true : oDebugValue(__this);
     }
 
+    // fov
     typedef void(__fastcall* tSetfieldOfView)(void* CameraMain, float fov);
     inline tSetfieldOfView oSetfieldOfView = nullptr;
 
     inline void __fastcall hkSetfieldOfView(void* CameraMain, float fov)
     {
+        if (CameraMain) {
+            vars::pMainCamera = CameraMain; // add camera to vars for w2s use
+        }
+
         if (!CameraMain) return;
         return oSetfieldOfView(CameraMain, vars::bCustomFieldOfView ? vars::fFieldOfView : fov);
     }
 
+    // stack limit
     typedef int(__fastcall* tGetStackLimit)(void* __this);
     inline tGetStackLimit oGetStackLimit = nullptr;
 
     inline int __fastcall hkGetStackLimit(void* __this)
     {
         return vars::bCustomStackLimit ? vars::iStackLimit : oGetStackLimit(__this);
+    }
+
+    // w2s
+    // Note: This typedef now uses the global Vector3 from vars.hpp
+    typedef Vector3(__fastcall* tWorldToScreenPoint)(void* camera, Vector3 pos, int eye);
+    inline tWorldToScreenPoint oWorldToScreenPoint = nullptr;
+
+    inline bool GetScreenPos(Vector3 worldPos, struct ImVec2& screenPos)
+    {
+        if (!vars::pMainCamera || !oWorldToScreenPoint) return false;
+
+        // 2 = Mono Eye (Standard)
+        Vector3 result = oWorldToScreenPoint(vars::pMainCamera, worldPos, 2);
+
+        // If Z < 0, object is behind camera
+        if (result.z <= 0.f) return false;
+
+        screenPos.x = result.x;
+        screenPos.y = ImGui::GetIO().DisplaySize.y - result.y; // Flip Y for ImGui
+        return true;
+    }
+
+    // player update 
+    typedef void(__fastcall* tPlayerUpdate)(void* __this);
+    inline tPlayerUpdate oPlayerUpdate = nullptr;
+
+    inline void __fastcall hkPlayerUpdate(void* __this)
+    {
+        if (__this)
+        {
+            void* klass = *(void**)__this;
+            if (klass)
+            {
+                // 0xB8 is standard for x64 Static Fields
+                void* staticFields = *(void**)((uintptr_t)klass + 0xB8);
+                if (staticFields) {
+                    vars::pPlayerList = *(void**)((uintptr_t)staticFields + offsets::player::StaticPlayerList);
+                }
+            }
+        }
+        return oPlayerUpdate(__this);
+    }
+
+	// get name for NPCs
+    typedef void* (__fastcall* tGetName)(void* object);
+    inline tGetName oGetName = nullptr;
+
+	// npc update - to gather npc list
+    typedef void* (__fastcall* tGetTransform)(void* component);
+    inline tGetTransform oGetTransform = nullptr;
+
+    typedef Vector3(__fastcall* tGetPosition)(void* transform);
+    inline tGetPosition oGetPosition = nullptr;
+
+    typedef void(__fastcall* tNpcUpdate)(void* __this);
+    inline tNpcUpdate oNpcUpdate = nullptr;
+
+    inline void __fastcall hkNpcUpdate(void* __this)
+    {
+        if (__this)
+        {
+            if (vars::vNpcList.empty())
+            {
+                vars::vNpcList.push_back(__this);
+            }
+            else
+            {
+                bool found = false;
+                for (void* npc : vars::vNpcList)
+                {
+                    if (npc == __this)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    vars::vNpcList.push_back(__this);
+                }
+            }
+        }
+        return oNpcUpdate(__this);
+    }
+
+    inline void ForceUnlock()
+    {
+        if (oSetLockState) oSetLockState(0, nullptr);
+        if (oSetVisible) oSetVisible(true, nullptr);
+    }
+
+    inline void CursorHandler() // restore function
+    {
+        if (oSetLockState) oSetLockState(vars::iLastGameLockState, nullptr);
+        if (oSetVisible) oSetVisible(vars::bLastCursorVisible, nullptr);
     }
 
     inline void Init()
@@ -78,9 +172,22 @@ namespace hooks
             Sleep(100);
         }
 
+		// il2cpp functions
+        HMODULE hGameAssembly = GetModuleHandle("GameAssembly.dll");
+        il2cpp_domain_get = (t_il2cpp_domain_get)GetProcAddress(hGameAssembly, "il2cpp_domain_get");
+        il2cpp_thread_attach = (t_il2cpp_thread_attach)GetProcAddress(hGameAssembly, "il2cpp_thread_attach");
+
         MH_Initialize();
 
-        // Helper macro to clean up hook creation
+        // w2s hook setup
+        uintptr_t w2sAddr = offsets::GameAssembly + offsets::unity::WorldToScreenPoint;
+        oWorldToScreenPoint = (tWorldToScreenPoint)w2sAddr;
+
+		oGetTransform = (tGetTransform)(offsets::GameAssembly + offsets::unity::GetTransform); // Player Transform
+		oGetPosition = (tGetPosition)(offsets::GameAssembly + offsets::unity::GetPosition); // Transform Position
+		oGetName = (tGetName)(offsets::GameAssembly + offsets::unity::GetName); // Get Name
+
+        // macro for qol 
 #define CREATE_HOOK(addr, hook, orig) \
             if (MH_CreateHook((void*)(offsets::GameAssembly + addr), &hook, (LPVOID*)&orig) == MH_OK) \
                 MH_EnableHook((void*)(offsets::GameAssembly + addr));
@@ -90,5 +197,7 @@ namespace hooks
         CREATE_HOOK(offsets::debug::DebugValue, hkDebugValue, oDebugValue);
         CREATE_HOOK(offsets::localplayer::SetfieldOfView, hkSetfieldOfView, oSetfieldOfView);
         CREATE_HOOK(offsets::localplayer::GetStackLimit, hkGetStackLimit, oGetStackLimit);
+        CREATE_HOOK(offsets::player::PlayerUpdate, hkPlayerUpdate, oPlayerUpdate);
+        CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
     }
 }

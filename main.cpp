@@ -46,11 +46,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
             return vars::oPresent(pSwapChain, SyncInterval, Flags);
     }
 
+	// il2cpp thread attach for getname
+    if (hooks::il2cpp_domain_get && hooks::il2cpp_thread_attach) {
+        void* domain = hooks::il2cpp_domain_get();
+        if (domain) {
+            hooks::il2cpp_thread_attach(domain);
+        }
+    }
+
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
     gui::Render();
+	esp::Render();
 
     ImGui::Render();
     vars::pContext->OMSetRenderTargets(1, &vars::mainRenderTargetView, NULL);

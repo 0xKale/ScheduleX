@@ -1,7 +1,9 @@
 #pragma once
 #include <Windows.h>
+#include <vector>
 #include <d3d11.h>
 #include <dxgi.h>
+#include <string>
 
 // ImGui
 #include "imgui/imgui.h"
@@ -20,3 +22,4 @@ typedef uintptr_t PTR;
 #include "offsets.hpp"
 #include "vars.hpp"
 #include "hooks.hpp"
+#include "esp.hpp"
