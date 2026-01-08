@@ -15,3 +15,8 @@
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
+
+// this needs to be in this order dont remix them please ty 
+#include "offsets.hpp"
+#include "vars.hpp"
+#include "hooks.hpp"

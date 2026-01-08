@@ -4,12 +4,6 @@
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-Present oPresent;
-HWND window = NULL;
-WNDPROC oWndProc;
-ID3D11Device* pDevice = NULL;
-ID3D11DeviceContext* pContext = NULL;
-ID3D11RenderTargetView* mainRenderTargetView;
 
 void InitImGui()
 {
@@ -17,15 +11,15 @@ void InitImGui()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
     ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(window);
-    ImGui_ImplDX11_Init(pDevice, pContext);
+    ImGui_ImplWin32_Init(vars::window);
+    ImGui_ImplDX11_Init(vars::pDevice, vars::pContext);
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (gui::bShowMenu && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+    if (vars::bShowMenu && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
-    return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+    return CallWindowProc(vars::oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
 bool init = false;
@@ -33,23 +27,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 {
     if (!init)
     {
-        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDevice)))
+        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&vars::pDevice)))
         {
-            pDevice->GetImmediateContext(&pContext);
+            vars::pDevice->GetImmediateContext(&vars::pContext);
             DXGI_SWAP_CHAIN_DESC sd;
             pSwapChain->GetDesc(&sd);
-            window = sd.OutputWindow;
+            vars::window = sd.OutputWindow;
             ID3D11Texture2D* pBackBuffer;
             pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-            pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
+            vars::pDevice->CreateRenderTargetView(pBackBuffer, NULL, &vars::mainRenderTargetView);
             pBackBuffer->Release();
-            oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
+            vars::oWndProc = (WNDPROC)SetWindowLongPtr(vars::window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
             InitImGui();
             init = true;
         }
         else
-            return oPresent(pSwapChain, SyncInterval, Flags);
+            return vars::oPresent(pSwapChain, SyncInterval, Flags);
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -59,9 +53,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     gui::Render();
 
     ImGui::Render();
-    pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+    vars::pContext->OMSetRenderTargets(1, &vars::mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-    return oPresent(pSwapChain, SyncInterval, Flags);
+    return vars::oPresent(pSwapChain, SyncInterval, Flags);
 }
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
@@ -71,7 +65,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
     {
         if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
         {
-            kiero::bind(8, (void**)&oPresent, hkPresent);
+            // Bind kiero to vars::oPresent
+            kiero::bind(8, (void**)&vars::oPresent, hkPresent);
             hooks::Init();
             init_hook = true;
         }
