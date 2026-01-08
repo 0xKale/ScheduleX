@@ -34,21 +34,29 @@ namespace vars
 	inline float fFieldOfView = 90.0f; // default FOV
 
     inline bool bCustomStackLimit = false;
-	inline int iStackLimit = 20; // default stack limit
+	inline int iStackLimit = 20; // default stack limit 20
 
+
+    // debug shit
     inline bool bDebug = false;
     inline float fDebugFloat = 1.0f;
     inline int iDebugInt = 0;
 
-    //w2s
+    //w2s + esp stuff
     inline void* pMainCamera = nullptr; // To store the Unity Camera
-    inline bool bEspEnabled = true;  // Toggle for ESP
-    inline bool bDrawBox = true; // Toggle for Boxes
+    inline bool bEspEnabled = false;  // Toggle for ESP
+    inline bool bDrawBox = false; // Toggle for Boxes
 	inline bool bPlayerEsp = false; // Toggle for Player ESP
     inline bool bNpcEsp = false; // Toggle for NPC ESP
 
 	inline void* pPlayerList = nullptr;// player list
-    inline void* pLocalPlayer = nullptr;
+	inline void* pLocalPlayer = nullptr; // local player
 
-    inline std::vector<void*> vNpcList;
+	inline std::vector<void*> vNpcList; // npc list
+
+
+    //ESP COLORS
+    inline float cPlayerBox[4] = { 1.0f, 0.0f, 0.0f, 1.0f }; // red
+    inline float cNpcBox[4] = { 1.0f, 1.0f, 0.0f, 1.0f }; // yellow
+	inline float cNpcName[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; // white
 }

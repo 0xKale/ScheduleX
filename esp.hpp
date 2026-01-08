@@ -4,11 +4,7 @@
 
 namespace esp
 {
-    // =============================================================
-    // HELPER FUNCTIONS
-    // =============================================================
-
-    // 1. Draw Box Helper
+    // Draw Box func
     inline void DrawBox(float x, float y, float w, float h, ImColor color)
     {
         ImGui::GetBackgroundDrawList()->AddRect(
@@ -19,16 +15,15 @@ namespace esp
         );
     }
 
-    // 2. Unity List Struct (For PlayerList)
+    // Unity List Struct (For PlayerList)
     template<typename T>
     struct UnityList {
         void* unk0; void* unk1;
         T* items; int size;
     };
 
-    // 3. Get Item Helper (For PlayerList)
     template<typename T>
-    T GetItem(void* listPtr, int index) {
+    T GetItem(void* listPtr, int index) { // Get Item Helper (For PlayerList)
         if (!listPtr) return nullptr;
         UnityList<T>* list = (UnityList<T>*)listPtr;
         if (index < 0 || index >= list->size) return nullptr;
@@ -36,8 +31,7 @@ namespace esp
         return (T)rawArray[index];
     }
 
-    // 4. Get Name Helper (Reads C# String)
-    inline std::string GetNameFromUnity(void* obj)
+    inline std::string GetNameFromUnity(void* obj)// Get Name Helper (Reads C# String)
     {
         // Ensure the object and the hook exist
         if (!obj || !hooks::oGetName) return "Unknown";
@@ -51,39 +45,26 @@ namespace esp
         // [0x14] = start of wide characters (char16_t)
         int length = *(int*)((uintptr_t)strPtr + 0x10);
 
-        // Safety check on length to avoid reading garbage memory
-        if (length <= 0 || length > 128) return "Unknown";
+        if (length <= 0 || length > 128) return "Unknown";// Safety check on length to avoid reading garbage memory
 
         char16_t* chars = (char16_t*)((uintptr_t)strPtr + 0x14);
         std::string result = "";
-
-        // Convert Wide Char to Standard Char
         for (int i = 0; i < length; i++) {
-            result += (char)chars[i];
+            result += (char)chars[i]; // Convert Wide Char to Standard Char
         }
         return result;
     }
 
-    // =============================================================
-    // MAIN RENDER LOOP
-    // =============================================================
     inline void Render()
     {
-        // 1. Global Master Switch & Safety Checks
-        if (!vars::bEspEnabled || !vars::pMainCamera) return;
+        if (!vars::bEspEnabled || !vars::pMainCamera) return;//Global Master Switch & Safety Checks
+        if (!hooks::oGetTransform || !hooks::oGetPosition) return;// Ensure we have the basic Unity functions needed
 
-        // Ensure we have the basic Unity functions needed
-        if (!hooks::oGetTransform || !hooks::oGetPosition) return;
-
-        // ---------------------------------------------------------
-        // A. PLAYER ESP (Red Boxes)
-        // ---------------------------------------------------------
+        //player esp
         if (vars::bPlayerEsp && vars::pPlayerList)
         {
             auto list = (UnityList<void*>*)vars::pPlayerList;
-
-            // Sanity check size
-            if (list->size > 0 && list->size < 1000)
+            if (list->size > 0 && list->size < 1000)// Sanity check size
             {
                 for (int i = 0; i < list->size; i++)
                 {
@@ -110,7 +91,7 @@ namespace esp
                             float y = headPos.y;
 
                             if (vars::bDrawBox) {
-                                DrawBox(x, y, width, height, ImColor(255, 0, 0)); // RED
+                                DrawBox(x, y, width, height, ImColor(vars::cPlayerBox[0], vars::cPlayerBox[1], vars::cPlayerBox[2])); // draw player box
                             }
                         }
                     }
@@ -118,9 +99,7 @@ namespace esp
             }
         }
 
-        // ---------------------------------------------------------
-        // B. NPC ESP (Yellow Boxes + Names)
-        // ---------------------------------------------------------
+		// npc esp
         if (vars::bNpcEsp && !vars::vNpcList.empty())
         {
             for (size_t i = 0; i < vars::vNpcList.size(); i++)
@@ -147,23 +126,17 @@ namespace esp
                         float x = footPos.x - (width / 2.0f);
                         float y = headPos.y;
 
-                        // 1. Draw Box
                         if (vars::bDrawBox) {
-                            DrawBox(x, y, width, height, ImColor(255, 255, 0)); // YELLOW
+                            DrawBox(x, y, width, height, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2])); // draw npc box
                         }
 
-                        // 2. Draw Name
-                        std::string name = GetNameFromUnity(npc);
+                        std::string name = GetNameFromUnity(npc); // draw npc name
 
-                        // Calculate text centering
                         ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
                         float textX = x + (width / 2.0f) - (textSize.x / 2.0f);
                         float textY = y - textSize.y - 2.0f; // 2px padding above head
-
-                        // Draw Shadow (Black)
-                        ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX + 1, textY + 1), ImColor(0, 0, 0), name.c_str());
-                        // Draw Text (White)
-                        ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX, textY), ImColor(255, 255, 255), name.c_str());
+						ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX + 1, textY + 1), ImColor(0, 0, 0), name.c_str()); // black outline/shadow
+                        ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX, textY),ImColor(vars::cNpcName[0], vars::cNpcName[1], vars::cNpcName[2]),name.c_str());
                     }
                 }
             }

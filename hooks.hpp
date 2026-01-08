@@ -70,7 +70,6 @@ namespace hooks
     }
 
     // w2s
-    // Note: This typedef now uses the global Vector3 from vars.hpp
     typedef Vector3(__fastcall* tWorldToScreenPoint)(void* camera, Vector3 pos, int eye);
     inline tWorldToScreenPoint oWorldToScreenPoint = nullptr;
 
@@ -97,11 +96,11 @@ namespace hooks
     {
         if (__this)
         {
-            void* klass = *(void**)__this;
-            if (klass)
+            void* Class = *(void**)__this;
+            if (Class)
             {
                 // 0xB8 is standard for x64 Static Fields
-                void* staticFields = *(void**)((uintptr_t)klass + 0xB8);
+                void* staticFields = *(void**)((uintptr_t)Class + 0xB8);
                 if (staticFields) {
                     vars::pPlayerList = *(void**)((uintptr_t)staticFields + offsets::player::StaticPlayerList);
                 }
@@ -149,7 +148,7 @@ namespace hooks
                 }
             }
         }
-        return oNpcUpdate(__this);
+        return oNpcUpdate(__this); // ts so ugly twin
     }
 
     inline void ForceUnlock()
@@ -162,6 +161,7 @@ namespace hooks
     {
         if (oSetLockState) oSetLockState(vars::iLastGameLockState, nullptr);
         if (oSetVisible) oSetVisible(vars::bLastCursorVisible, nullptr);
+		//find a beter way to do this later. at main menu it scuffs
     }
 
     inline void Init()

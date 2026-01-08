@@ -8,7 +8,6 @@ namespace gui
         ImGui::Checkbox("Debug", &vars::bDebug);
 
 
-
         ImGui::Separator();
         ImGui::Checkbox("Custom FOV", &vars::bCustomFieldOfView);
         if (vars::bCustomFieldOfView) {
@@ -22,6 +21,49 @@ namespace gui
             ImGui::Indent();
             ImGui::SliderInt("Max Stack Size", &vars::iStackLimit, 20, 100);
             ImGui::Unindent();
+        }
+    }
+
+    inline void RenderEspTab()
+    {
+        ImGui::Checkbox("Enable Master ESP", &vars::bEspEnabled);
+
+        if (vars::bEspEnabled)
+        {
+            ImGui::Indent();
+            ImGui::Checkbox("Draw Boxes", &vars::bDrawBox);
+
+            ImGui::Checkbox("Show NPCs", &vars::bNpcEsp);
+            if (vars::bNpcEsp) {
+                ImGui::Indent();
+                ImGui::ColorEdit4("NPC Box Color", vars::cNpcBox, ImGuiColorEditFlags_NoInputs);
+                ImGui::ColorEdit4("NPC Name Color", vars::cNpcName, ImGuiColorEditFlags_NoInputs);
+                ImGui::Unindent();
+            }
+            ImGui::Unindent();
+        }
+    }
+
+    inline void RenderPlayersTab()
+    {
+        ImGui::Checkbox("Show Players", &vars::bPlayerEsp);
+        if (vars::bPlayerEsp) {
+            ImGui::Indent();
+            ImGui::ColorEdit4("Box Color", vars::cPlayerBox, ImGuiColorEditFlags_NoInputs);
+            ImGui::Unindent();
+        }
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "debug shit");
+
+        if (vars::pPlayerList)
+        {
+            int count = *(int*)((uintptr_t)vars::pPlayerList + 0x18);
+            ImGui::Text("List Address: %p", vars::pPlayerList);
+            ImGui::Text("Players Detected: %d", count);
+        }
+        else
+        {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Searching for PlayerList...");
         }
     }
 
@@ -54,40 +96,19 @@ namespace gui
                     RenderQoLTab();
                     ImGui::EndTabItem();
                 }
-				if (ImGui::BeginTabBar("ESPTabBar"))
+
+                if (ImGui::BeginTabItem("ESP"))
                 {
-                    if (ImGui::BeginTabItem("ESP"))
-                    {
-                        ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
-
-                        if (vars::bEspEnabled)
-                        {
-                            ImGui::Indent();
-                            ImGui::Checkbox("Show Players", &vars::bPlayerEsp);
-                            ImGui::Checkbox("Show NPCs", &vars::bNpcEsp); // <--- ADD THIS
-                            ImGui::Unindent();
-                        }
-                        ImGui::Checkbox("Draw Boxes", &vars::bDrawBox);
-                        ImGui::Separator();
-                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "--- DEBUG INFO ---");
-
-                        // 1. Check if we found the list
-                        if (vars::pPlayerList)
-                        {
-                            // 2. Read the size directly from memory (Offset 0x18 is standard for C# Lists)
-                            int count = *(int*)((uintptr_t)vars::pPlayerList + 0x18);
-
-                            ImGui::Text("List Address: %p", vars::pPlayerList);
-                            ImGui::Text("Players Detected: %d", count);
-                        }
-                        else
-                        {
-                            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Searching for PlayerList...");
-                        }
-                        ImGui::EndTabItem();
-                    }
-                    ImGui::EndTabBar();
+                    RenderEspTab();
+                    ImGui::EndTabItem();
                 }
+
+                if (ImGui::BeginTabItem("Players"))
+                {
+                    RenderPlayersTab();
+                    ImGui::EndTabItem();
+                }
+
                 ImGui::EndTabBar();
             }
         }
