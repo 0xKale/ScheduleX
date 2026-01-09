@@ -321,22 +321,46 @@ namespace hooks
     inline void __fastcall hkSkateEffectsUpdate(void* __this)
     {
         if (oSkateEffectsUpdate) oSkateEffectsUpdate(__this);
-
         if (!__this || (uintptr_t)__this < 0x10000) return;
         if (vars::bModifySkate)
         {
             uintptr_t board = *(uintptr_t*)((uintptr_t)__this + offsets::skating::boardInstance);
+
             if (board > 0x10000)
             {
-                *(float*)(board + offsets::skating::gravity) = vars::fSkateGravity;
-                *(float*)(board + offsets::skating::turnForce) = vars::fSkateTurn;
+                *(float*)(board + offsets::skating::topSpeed) = vars::fSkateTopSpeed;
+                *(float*)(board + offsets::skating::reverseTopSpeed) = vars::fSkateReverseSpeed;
+                *(float*)(board + offsets::skating::pushForce) = vars::fSkatePushForce;
+                *(float*)(board + offsets::skating::pushDuration) = vars::fSkatePushDur;
+                *(float*)(board + offsets::skating::turnForce) = vars::fSkateTurnForce;
+                *(float*)(board + offsets::skating::turnChangeRate) = vars::fSkateResponse;
+                *(float*)(board + offsets::skating::turnReturnRate) = vars::fSkateSnappiness;
                 *(float*)(board + offsets::skating::turnSpeedBoost) = vars::fSkateBoost;
-                if (vars::bInstantJump)
-                {
-                    float currentCharge = *(float*)(board + offsets::skating::jumpCharge);
-                    if (currentCharge > 0.01f) {
-                        *(float*)(board + offsets::skating::jumpCharge) = 1.0f;
-                    }
+                *(float*)(board + offsets::skating::rotationClamp) = vars::fSkateSpinLimit;
+                *(float*)(board + offsets::skating::gravity) = vars::fSkateGravity;
+                *(float*)(board + offsets::skating::brakeForce) = vars::fSkateBrake;
+                *(float*)(board + offsets::skating::longFriction) = vars::fSkateLongFriction;
+                *(float*)(board + offsets::skating::latFriction) = vars::fSkateLatFriction; // Low value = Drifting
+                *(bool*)(board + offsets::skating::slowOnTerrain) = vars::bSkateSlowOnGrass; // Force false to ignore grass
+                *(float*)(board + offsets::skating::jumpForce) = vars::fSkateJumpBase;
+                *(float*)(board + offsets::skating::jumpFwdBoost) = vars::fSkateJumpFwd;
+
+                float currentCharge = *(float*)(board + offsets::skating::jumpCharge);
+                if (currentCharge > 0.01f && vars::fSkateJumpMult > 1.0f) {
+                    *(float*)(board + offsets::skating::jumpCharge) = vars::fSkateJumpMult;
+                }
+
+                *(bool*)(board + offsets::skating::airMoveEnabled) = vars::bSkateAirControl;
+                if (vars::bSkateAirControl) {
+                    *(float*)(board + offsets::skating::airMoveForce) = vars::fSkateAirForce;
+                }
+
+                if (vars::bHoverMode) {
+                    *(float*)(board + offsets::skating::hoverHeight) = vars::fHoverHeight;
+                    *(float*)(board + offsets::skating::hoverRayLen) = vars::fHoverHeight + 1.5f; // Look a bit lower than height
+                    *(float*)(board + offsets::skating::hoverForce) = 50.0f;
+                    *(float*)(board + offsets::skating::latFriction) = 0.05f;
+                    *(float*)(board + offsets::skating::brakeForce) = 0.0f;
                 }
             }
         }

@@ -80,21 +80,44 @@ namespace offsets
         inline uintptr_t GetTempMultiplier = 0xA3FA20; //ScheduleOne.Growing.GrowContainer$$GetTemperatureGrowthMultiplier
     }
     namespace skating {
-        // Class: ScheduleOne.Skating.SkateboardEffects
-        // Function: FixedUpdate
-        // RVA: 0xAC2CA0
-        inline uintptr_t EffectsFixedUpdate = 0xAC2CA0; // ScheduleOne_Skating_SkateboardEffects$$FixedUpdate
-
-        // Field: private Skateboard skateboard; // 0x20
+		inline uintptr_t EffectsFixedUpdate = 0xAC2CA0; // Skateboard Effects FixedUpdate - ScheduleOne.Skating.SkateboardEffects$$FixedUpdate
         inline uintptr_t boardInstance = 0x20;
 
-        // --- SKATEBOARD CLASS OFFSETS ---
-        // Class: ScheduleOne.Skating.Skateboard
-        inline uintptr_t currentSpeed = 0x118; // float
-        inline uintptr_t jumpCharge = 0x120; // float
-        inline uintptr_t turnForce = 0x188; // float
-        inline uintptr_t turnSpeedBoost = 0x194; // float
-        inline uintptr_t gravity = 0x1A0; // float
-        inline uintptr_t brakeForce = 0x1A4; // float
+        inline uintptr_t currentSpeed = 0x118; // float (Read-Only usually)
+        inline uintptr_t topSpeed = 0x214; // float: Max Kmh forward
+        inline uintptr_t reverseTopSpeed = 0x1A8; // float: Max Kmh backward
+        inline uintptr_t pushForce = 0x218; // float: Acceleration per kick
+        inline uintptr_t pushDuration = 0x228; // float: How long acceleration lasts after kicking
+
+		// handling/tuning
+        inline uintptr_t turnForce = 0x188; // float: How hard it turns
+        inline uintptr_t turnChangeRate = 0x18C; // float: Response time (Input Lag)
+        inline uintptr_t turnReturnRate = 0x190; // float: Snappiness (Centering speed)
+        inline uintptr_t turnSpeedBoost = 0x194; // float: Speed gained while turning (Carving)
+        inline uintptr_t rotationClamp = 0x1B8; // float: Max rotation speed (Limits 360s/Reverts)
+
+		// physics
+        inline uintptr_t gravity = 0x1A0; // float: Downward force
+        inline uintptr_t brakeForce = 0x1A4; // float: Rolling resistance
+        inline uintptr_t slowOnTerrain = 0x1BC; // bool:  Does grass/dirt slow you down?
+        inline uintptr_t frictionEnabled = 0x1BD; // bool:  Master friction switch
+        inline uintptr_t longFriction = 0x1C8; // float: Longitudinal (Forward/Back) Grip
+        inline uintptr_t latFriction = 0x1CC; // float: Lateral (Sideways) Grip -> Controls Drifting
+
+        // jump
+        inline uintptr_t jumpCharge = 0x120; // float: Current charge (0.0 to 1.0)
+        inline uintptr_t jumpForce = 0x1D0; // float: Base vertical power
+        inline uintptr_t jumpDurMin = 0x1D4; // float: Minimum time force is applied
+        inline uintptr_t jumpDurMax = 0x1D8; // float: Maximum time force is applied
+        inline uintptr_t jumpFwdBoost = 0x1F8; // float: Forward velocity added on jump
+
+        // air control
+        inline uintptr_t airMoveEnabled = 0x238; // bool:  Can you steer while airborne?
+        inline uintptr_t airMoveForce = 0x23C; // float: Power of air steering
+
+        // hover
+        inline uintptr_t hoverForce = 0x1FC; // float: Upward lifting force
+        inline uintptr_t hoverRayLen = 0x200; // float: How far down to look for ground
+        inline uintptr_t hoverHeight = 0x204; // float: Target floating height
     }
 }

@@ -112,15 +112,80 @@ namespace vars
 
 
     // world tab 
+
     inline bool bModifyWorld = false;
     inline float fGrowMultiplier = 1.0f;
 
-
-    // SKATING VARIABLES
     inline bool bModifySkate = false;
-    inline bool bInstantJump = false;
-    inline float fSkateGravity = 20.0f;    // Normal gravity
-    inline float fSkateTurn = 50.0f;       // Turning sharpness
-    inline float fSkateBoost = 10.0f;      // Speed gain while turning
-    inline float fSkateJumpCharge = 0.0f;  // Instant Jump Charge
+
+    // speed
+    inline float fSkateTopSpeed = 32.0f;     // Default 32.0. Set to 300 for Super Sonic.
+    inline float fSkateReverseSpeed = 1.0f;  // Default 1.0.
+    inline float fSkatePushForce = 9.0f;     // Default 9.0. Higher = more speed per kick.
+    inline float fSkatePushDur = 0.5f;       // Default 0.5. Higher = glide longer after kick.
+
+	// handling
+    inline float fSkateTurnForce = 25.0f;    // Default 25.0.
+    inline float fSkateResponse = 4.0f;      // "TurnChangeRate". Default 4.0. Higher = Instant turning.
+    inline float fSkateSnappiness = 1.5f;    // "TurnReturnRate". Default 1.5. Higher = Board snaps straight.
+    inline float fSkateBoost = 1.0f;         // "TurnSpeedBoost". Default 1.0. Higher = Infinite speed while turning.
+    inline float fSkateSpinLimit = 5.0f;     // "RotationClamp". Default 5.0. Set high (1000) to spin incredibly fast.
+
+	// physics & friction
+    inline float fSkateGravity = 12.0f;      // Default 12.0. Lower = Moon gravity.
+    inline float fSkateBrake = 4.0f;         // "BrakeForce". Default 4.0. Set to 0.0 for Infinite Roll.
+    inline float fSkateLongFriction = 0.9f;  // Forward Grip. Default 0.9.
+    inline float fSkateLatFriction = 10.0f;  // Sideways Grip. Default 10.0. Set to 0.1 for drifting/sliding.
+    inline bool  bSkateSlowOnGrass = true;   // Default true. Set false to go fast on grass.
+
+    // jump
+    inline float fSkateJumpBase = 35.0f;     // "JumpForce". Default 35.0. Base height.
+    inline float fSkateJumpFwd = 15.0f;      // "JumpFwdBoost". Default 15.0. Forward launch power.
+    inline float fSkateJumpMult = 1.0f;      // Instant Charge Multiplier (e.g. 10.0x).
+
+    // air control
+    inline bool  bSkateAirControl = true;    // Default true. Enable steering in air.
+    inline float fSkateAirForce = 10.0f;     // Default 10.0. How hard you can steer in air.
+
+    // hover
+    inline bool  bHoverMode = false;         // Enable hovering.
+    inline float fHoverHeight = 0.2f;        // Height in meters.
+}
+
+namespace defaults
+{
+
+    //WORLD DEFAULTS
+    // Speed
+    constexpr float topSpeed = 32.0f;
+    constexpr float reverseSpeed = 1.0f;
+    constexpr float pushForce = 9.0f;
+    constexpr float pushDur = 0.5f;
+
+    // Handling
+    constexpr float turnForce = 25.0f;
+    constexpr float response = 4.0f;
+    constexpr float snappiness = 1.5f;
+    constexpr float boost = 1.0f;
+    constexpr float spinLimit = 5.0f;
+
+    // Physics
+    constexpr float gravity = 12.0f;
+    constexpr float brake = 4.0f;
+    constexpr float longFriction = 0.9f;
+    constexpr float latFriction = 10.0f;
+    constexpr bool  slowOnGrass = true;
+
+    // Jump
+    constexpr float jumpBase = 35.0f;
+    constexpr float jumpFwd = 15.0f;
+    constexpr float jumpMult = 1.0f;
+
+    // Air
+    constexpr bool  airControl = true;
+    constexpr float airForce = 10.0f;
+
+    // Hover (Mod Defaults)
+    constexpr bool  hoverMode = false;
+    constexpr float hoverHeight = 0.2f;
 }

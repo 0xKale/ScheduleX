@@ -3,6 +3,51 @@
 
 namespace gui
 {
+    void ResetSpeed() {
+        vars::fSkateTopSpeed = defaults::topSpeed;
+        vars::fSkateReverseSpeed = defaults::reverseSpeed;
+        vars::fSkatePushForce = defaults::pushForce;
+        vars::fSkatePushDur = defaults::pushDur;
+    }
+
+    void ResetHandling() {
+        vars::fSkateTurnForce = defaults::turnForce;
+        vars::fSkateResponse = defaults::response;
+        vars::fSkateSnappiness = defaults::snappiness;
+        vars::fSkateBoost = defaults::boost;
+        vars::fSkateSpinLimit = defaults::spinLimit;
+    }
+
+    void ResetPhysics() {
+        vars::fSkateGravity = defaults::gravity;
+        vars::fSkateBrake = defaults::brake;
+        vars::fSkateLongFriction = defaults::longFriction;
+        vars::fSkateLatFriction = defaults::latFriction;
+        vars::bSkateSlowOnGrass = defaults::slowOnGrass;
+    }
+
+    void ResetJumpAndAir() {
+        vars::fSkateJumpBase = defaults::jumpBase;
+        vars::fSkateJumpFwd = defaults::jumpFwd;
+        vars::fSkateJumpMult = defaults::jumpMult;
+        vars::bSkateAirControl = defaults::airControl;
+        vars::fSkateAirForce = defaults::airForce;
+    }
+
+
+    void ResetHover() {
+        vars::bHoverMode = defaults::hoverMode;
+        vars::fHoverHeight = defaults::hoverHeight;
+    }
+
+    void ResetAll() {
+        ResetSpeed();
+        ResetHandling();
+        ResetPhysics();
+        ResetJumpAndAir();
+        ResetHover();
+    }
+
     inline void RenderQoLTab()
     {
         ImGui::Checkbox("Debug", &vars::bDebug);
@@ -102,22 +147,91 @@ namespace gui
         if (vars::bModifySkate) {
             ImGui::Indent();
 
-            ImGui::Text("Physics");
-            // Gravity: Lower is floatier. 9.8 is earth. 50+ is heavy.
-            ImGui::SliderFloat("Gravity", &vars::fSkateGravity, 0.0f, 50.0f, "%.1f");
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("0.0 = Hoverboard mode.");
-
-            ImGui::Text("Handling");
-            // Turn Force: Higher = Snappier turns
-            ImGui::SliderFloat("Turn Force", &vars::fSkateTurn, 10.0f, 200.0f, "%.1f");
-
-            // Speed Boost: How much speed you gain/lose when carving
-            ImGui::SliderFloat("Turn Boost", &vars::fSkateBoost, 0.0f, 50.0f, "%.1f");
-
+            if (ImGui::Button("RESET ALL TO DEFAULTS", ImVec2(-1, 0))) { 
+                ResetAll();
+            }
+            ImGui::Separator();
+			// speed & acceleration
             ImGui::Spacing();
-            ImGui::Text("Tricks");
-            ImGui::Checkbox("Instant Max Jump", (bool*)&vars::fSkateJumpCharge); // Cast float* to bool* for checkbox is risky, better use a bool in vars
-            // Note: For 'Instant Max Jump', you might want to use a real bool in vars.hpp and set the float inside the hook based on that bool.
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "[ SPEED & ACCELERATION ]");
+            if (ImGui::SmallButton("Reset Speed")) ResetSpeed();
+            ImGui::SliderFloat("Top Speed", &vars::fSkateTopSpeed, 50.0f, 500.0f, "%.0f km/h");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Absolute max speed limit.");
+
+            ImGui::SliderFloat("Reverse Speed", &vars::fSkateReverseSpeed, 10.0f, 200.0f, "%.0f km/h");
+
+            ImGui::SliderFloat("Kick Power", &vars::fSkatePushForce, 1.0f, 20.0f, "%.1f x");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Acceleration per kick. Set to 10 for instant launch.");
+
+            ImGui::SliderFloat("Kick Glide", &vars::fSkatePushDur, 1.0f, 5.0f, "%.1f s");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("How long the acceleration lasts after a kick.");
+
+			// handling & turning
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1, 0, 1, 1), "[ HANDLING & TURNING ]");
+            if (ImGui::SmallButton("Reset Handling")) ResetHandling();
+
+            ImGui::SliderFloat("Turn Radius", &vars::fSkateTurnForce, 10.0f, 300.0f, "%.0f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Higher = Tighter turns.");
+
+            ImGui::SliderFloat("Responsiveness", &vars::fSkateResponse, 1.0f, 100.0f, "%.0f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Input Lag. Higher = Instant reaction.");
+
+            ImGui::SliderFloat("Snappiness", &vars::fSkateSnappiness, 1.0f, 100.0f, "%.0f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("How fast the board centers itself.");
+
+            ImGui::SliderFloat("Spin Limit", &vars::fSkateSpinLimit, 1.0f, 1000.0f, "%.0f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Max rotation speed. Set to 1000 for instant Reverts/360s.");
+
+            ImGui::SliderFloat("Carve Boost", &vars::fSkateBoost, 0.0f, 100.0f, "%.1f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Speed gained by turning. Wiggle to accelerate.");
+
+			// physics & drift
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "[ PHYSICS & DRIFT ]");
+			if (ImGui::SmallButton("Reset Physics")) ResetPhysics();
+
+            ImGui::SliderFloat("Gravity", &vars::fSkateGravity, 0.0f, 50.0f, "%.1f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Earth = 9.8. Moon = 1.6. Zero = Space.");
+
+            ImGui::SliderFloat("Brake Force", &vars::fSkateBrake, 0.0f, 20.0f, "%.1f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Rolling resistance. 0.0 = Infinite Roll.");
+
+            ImGui::SliderFloat("Drift Grip", &vars::fSkateLatFriction, 0.0f, 2.0f, "%.2f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Sideways friction. 0.1 = Ice/Drift. 2.0 = Rails.");
+
+            ImGui::SliderFloat("Fwd Grip", &vars::fSkateLongFriction, 0.0f, 2.0f, "%.2f");
+
+            ImGui::Checkbox("Grass Slows You Down", &vars::bSkateSlowOnGrass);
+
+            // jump & air
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(0, 1, 1, 1), "[ JUMP & AIR ]");
+			if (ImGui::SmallButton("Reset Jump & Air")) ResetJumpAndAir();
+
+            ImGui::SliderFloat("Jump Height", &vars::fSkateJumpBase, 1.0f, 50.0f, "%.1f");
+            ImGui::SliderFloat("Jump Fwd Boost", &vars::fSkateJumpFwd, 0.0f, 50.0f, "%.1f");
+            ImGui::SliderFloat("Charge Multiplier", &vars::fSkateJumpMult, 1.0f, 20.0f, "%.1f x");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Instantly fills the jump charge meter X times over.");
+
+            ImGui::Checkbox("Enable Air Steering", &vars::bSkateAirControl);
+            if (vars::bSkateAirControl) {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(100);
+                ImGui::SliderFloat("Force", &vars::fSkateAirForce, 0.0f, 100.0f, "%.1f");
+            }
+            // hover
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "[ SPECIALS ]");
+            if (ImGui::SmallButton("Reset Physics")) ResetHover();
+
+            ImGui::Checkbox("HOVERBOARD MODE", &vars::bHoverMode);
+            if (vars::bHoverMode) {
+                ImGui::Indent();
+                ImGui::SliderFloat("Hover Height", &vars::fHoverHeight, 0.1f, 10.0f, "%.1f m");
+                ImGui::TextDisabled("Floats over water & obstacles!");
+                ImGui::Unindent();
+            }
 
             ImGui::Unindent();
         }
