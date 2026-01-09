@@ -58,12 +58,13 @@ namespace gui
         if (vars::bModifyMovement) {
             ImGui::SliderFloat("Run Speed", &vars::fWalkSpeed, 1.0f, 15.0f, "%.1f x");
             ImGui::SliderFloat("Jump Velocity", &vars::fJumpVelocity, 5.0f, 50.0f, "%.1f m/s");
-            ImGui::SliderFloat("Gravity Scale", &vars::fGravityScale, 0.0f, 1.0f, "%.2f G");
+            ImGui::Checkbox("Unlimited Jumps (Air Hop)", &vars::bInfiniteJump);
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("If disabled, you can only use the custom jump height when standing on the ground.");
+            ImGui::SliderFloat("Gravity Scale", &vars::fGravityScale, 0.0f, 2.0f, "%.2f G");
         }
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::Checkbox("God Mode", &vars::bGodMode);
-        ImGui::Checkbox("Infinite Stamina", &vars::bModifyPhysics);
+        ImGui::Checkbox("God Mode", &vars::bCanTakeDamage);
     }
 
     inline void RenderPoliceTab()

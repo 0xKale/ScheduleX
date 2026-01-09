@@ -150,17 +150,21 @@ namespace hooks
             if (vars::bModifyMovement)
             {
                 *(float*)(base + offsets::player::moveSpeed) = vars::fWalkSpeed;
-                float currentVel = *(float*)(base + offsets::player::verticalVelocity);
-                if (GetAsyncKeyState(VK_SPACE) & 1)
+                bool isGameGrounded = *(bool*)(base + offsets::player::isGrounded);
+
+                if (GetAsyncKeyState(VK_SPACE) & 1) // On Tap
                 {
-                    *(float*)(base + offsets::player::verticalVelocity) = vars::fJumpVelocity;
+                    if (vars::bInfiniteJump || isGameGrounded)
+                    {
+                        *(float*)(base + offsets::player::verticalVelocity) = vars::fJumpVelocity;
+                    }
                 }
+                float currentVel = *(float*)(base + offsets::player::verticalVelocity);
                 if (currentVel < -0.1f)
                 {
                     *(float*)(base + offsets::player::verticalVelocity) = currentVel * vars::fGravityScale;
                 }
             }
-
             if (vars::bModifyPhysics) {
                 *(float*)(base + offsets::player::stamina) = 100.0f;
             }
@@ -169,15 +173,14 @@ namespace hooks
     }
 
 
-    // add hook?
+    // self godmode
     typedef void(__fastcall* tTakeDamage)(void* __this, float damage, void* method);
     inline tTakeDamage oTakeDamage = nullptr;
 
     inline void __fastcall hkTakeDamage(void* __this, float damage, void* method)
     {
-        // If GodMode is on, you take 0 damage from all sources (including yourself)
         if (vars::bGodMode) {
-            return; // Exit without calling original = No damage taken
+            return; 
         }
         return oTakeDamage(__this, damage, method);
     }
@@ -404,7 +407,7 @@ namespace hooks
         CREATE_HOOK(offsets::localplayer::GetStackLimit, hkGetStackLimit, oGetStackLimit);
         CREATE_HOOK(offsets::player::PlayerModelUpdate, hkPlayerModelUpdate, oPlayerModelUpdate);
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
-		//CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); // dont work no need to hook
+		CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); 
 		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
         CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
 		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
@@ -417,6 +420,7 @@ namespace hooks
         CREATE_HOOK(offsets::item::ItemGetValue, hkGetItemValue, oGetItemValue);
 		CREATE_HOOK(offsets::dealer::DealerPriceMultiplier, hkGetPriceMultiplier, oGetPriceMultiplier);
         CREATE_HOOK(offsets::player::PlayerMovementUpdate, hkPlayerMovementUpdate, oPlayerMovementUpdate);
+		//CREATE_HOOK(offsets::player::TakeDamage, hkTakeDamage, oTakeDamage); // shitty
 
         
 

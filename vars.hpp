@@ -56,6 +56,7 @@ namespace vars
     inline float fWalkSpeed = 1.0f;
     inline float fJumpVelocity = 15.0f; // Set this higher for higher jumps
     inline float fGravityScale = 1.0f;  // 1.0 = Normal, 0.5 = Low Gravity
+    inline bool bInfiniteJump = false;
 
     // Casino Options
     inline bool bAlwaysJackpot = false;   // Toggle for Jackpot
