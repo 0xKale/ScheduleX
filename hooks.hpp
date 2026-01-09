@@ -116,6 +116,17 @@ namespace hooks
         return o_GetCurrentBetAmount(instance, method);
     }
 
+	// trash grabber capacity
+    typedef int32_t(*tGetCapacity)(void* instance, void* method);
+    inline tGetCapacity oGetCapacity = nullptr;
+
+    inline int32_t hkGetCapacity(void* instance, void* method) {
+        if (vars::bBetterTrashGrabber) {
+            return vars::iTrashGrabberCapacityAmount;
+        }
+        return oGetCapacity(instance, method);
+    }
+
     // w2s
     typedef Vector3(__fastcall* tWorldToScreenPoint)(void* camera, Vector3 pos, int eye);
     inline tWorldToScreenPoint oWorldToScreenPoint = nullptr;
@@ -278,6 +289,7 @@ namespace hooks
         CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
 		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
 		//CREATE_HOOK(offsets::localplayer::GrassUpdate, hkGrassPlayerUpdate, oGrassPlayerUpdate); // dont work to stop player moving when menu open
+        CREATE_HOOK(offsets::equippable::TrashGrabberGetCapacity, hkGetCapacity, oGetCapacity);
         
     }
 }

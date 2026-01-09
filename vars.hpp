@@ -50,6 +50,10 @@ namespace vars
     inline bool bCustomBet = false;       // Toggle for Custom Bet
     inline int iBetAmount = 1000;         // Value for Custom Bet
 
+	// equipable
+	inline int iTrashGrabberCapacityAmount = 9999; // trash grabber capacity
+	inline bool bBetterTrashGrabber = false; // toggle for trash grabber capacity
+
 
     // debug shit
     inline bool bDebug = false;

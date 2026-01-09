@@ -34,6 +34,9 @@ namespace offsets
 		inline uintptr_t RVA_GetRandomSymbol = 0x7EE610; // Get Random Symbol - ScheduleOne.Casino.SlotMachine.SlotMachineReel$$GetRandomSymbol
 		inline uintptr_t RVA_GetCurrentBet = 0x7F0870; // Get Current Bet - ScheduleOne.Casino.SlotMachine.SlotMachineController$$get_CurrentBet
     }
+    namespace equippable {
+        uintptr_t TrashGrabberGetCapacity = 0x8B4AD0; // ScheduleOne.Equipping.Equippable.TrashGrabber$$GetCapacity
+    }
     namespace player
     {
 		inline uintptr_t PlayerUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update

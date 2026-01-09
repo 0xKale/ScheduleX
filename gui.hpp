@@ -6,7 +6,6 @@ namespace gui
     inline void RenderQoLTab()
     {
         ImGui::Checkbox("Debug", &vars::bDebug);
-        ImGui::Checkbox("Show Watermark", &vars::bWatermark);
 
         ImGui::Separator();
         ImGui::Checkbox("Custom FOV", &vars::bCustomFieldOfView);
@@ -20,6 +19,13 @@ namespace gui
         if (vars::bCustomStackLimit) {
             ImGui::Indent();
             ImGui::SliderInt("Max Stack Size", &vars::iStackLimit, 20, 100);
+            ImGui::Unindent();
+        }
+        ImGui::Separator();
+        ImGui::Checkbox("Better Trash Grabber", &vars::bBetterTrashGrabber);
+        if (vars::bBetterTrashGrabber) {
+            ImGui::Indent();
+            ImGui::SliderInt("Capacity", &vars::iTrashGrabberCapacityAmount, 10, 9999);
             ImGui::Unindent();
         }
     }
@@ -109,6 +115,12 @@ namespace gui
         }
     }
 
+    inline void RenderOtherTab()
+    {
+        ImGui::Checkbox("Show Watermark", &vars::bWatermark);
+        ImGui::Separator();
+    }
+
     inline void Render()
     {
         if (GetAsyncKeyState(VK_HOME) & 1 || GetAsyncKeyState(VK_INSERT) & 1)
@@ -164,6 +176,12 @@ namespace gui
                 if (ImGui::BeginTabItem("Players"))
                 {
                     RenderPlayersTab();
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("Other"))
+                {
+                    RenderOtherTab();
                     ImGui::EndTabItem();
                 }
 
