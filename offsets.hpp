@@ -13,6 +13,7 @@ namespace offsets
         inline uintptr_t GetStackLimit = 0x997CC0;// Stack Limit - ScheduleOne.ItemFramework.ItemInstance$$get_StackLimit
 		inline uintptr_t CanTakeDamage = 0x66485; // Can Take Damage - ScheduleOne.PlayerScripts.Health.PlayerHealth$$get_CanTakeDamage // dont give godmode
 		inline uintptr_t RVA_RpcTakeDamage = 0x663110; // Set Can Take Damage - ScheduleOne.PlayerScripts.Health.PlayerHealth$$set_CanTakeDamage
+		inline uintptr_t GrassUpdate = 0x7B4F40; // StylizedGrassDemo_PlayerController$$Update
     }
     namespace debug
     {

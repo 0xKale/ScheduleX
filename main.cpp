@@ -19,6 +19,15 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     if (vars::bShowMenu && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
+    if (vars::bShowMenu) {
+        // This list covers clicks, movement, and scrolling
+        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN ||
+            uMsg == WM_MOUSEMOVE || uMsg == WM_MOUSEWHEEL)
+        {
+            return 1; // Block the message from reaching the game
+        }
+    }
+
     return CallWindowProc(vars::oWndProc, hWnd, uMsg, wParam, lParam);
 }
 

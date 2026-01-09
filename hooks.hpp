@@ -156,6 +156,20 @@ namespace hooks
         return oPlayerUpdate(__this);
     }
 
+
+	// player update - to prevent updates when menu is open
+    typedef void (*tGrassPlayerUpdate)(void* __this, void* method);
+    inline tGrassPlayerUpdate oGrassPlayerUpdate = nullptr;
+
+    inline void hkGrassPlayerUpdate(void* __this, void* method)
+    {
+        if (vars::bShowMenu) {
+            return;
+        }
+
+        return oGrassPlayerUpdate(__this, method);
+    }
+
 	// get name for NPCs
     typedef void* (__fastcall* tGetName)(void* object);
     inline tGetName oGetName = nullptr;
@@ -209,6 +223,14 @@ namespace hooks
         if (oSetLockState) oSetLockState(vars::iLastGameLockState, nullptr);
         if (oSetVisible) oSetVisible(vars::bLastCursorVisible, nullptr);
 		//find a beter way to do this later. at main menu it scuffs
+        if (!vars::bShowMenu) {
+            HWND hWnd = FindWindowA(NULL, "Schedule I"); // Replace with your actual Game Window Name
+            if (hWnd) {
+                RECT rect;
+                GetWindowRect(hWnd, &rect);
+                ClipCursor(&rect); // This locks the mouse inside the window borders
+            }
+        }
     }
 
     inline void Init()
@@ -235,7 +257,7 @@ namespace hooks
 		oGetName = (tGetName)(offsets::GameAssembly + offsets::unity::GetName); // Get Name
 
         // macro for qol 
-#define CREATE_HOOK(addr, hook, orig) \
+        #define CREATE_HOOK(addr, hook, orig) \
             if (MH_CreateHook((void*)(offsets::GameAssembly + addr), &hook, (LPVOID*)&orig) == MH_OK) \
                 MH_EnableHook((void*)(offsets::GameAssembly + addr));
 
@@ -250,5 +272,6 @@ namespace hooks
 		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
         CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
 		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
+		//CREATE_HOOK(offsets::localplayer::GrassUpdate, hkGrassPlayerUpdate, oGrassPlayerUpdate); // dont work to stop player moving when menu open
     }
 }
