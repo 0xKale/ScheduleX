@@ -159,6 +159,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="dump.cs" />
     <None Include="kiero\minhook\dll_resources\MinHook.def" />
   </ItemGroup>
   <ItemGroup>

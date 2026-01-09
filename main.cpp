@@ -99,6 +99,11 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hMod);
         CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+        AllocConsole();
+        FILE* f;
+        freopen_s(&f, "CONOUT$", "w", stdout);
+
+        std::cout << "--- Console Initialized ---" << std::endl;
         break;
     case DLL_PROCESS_DETACH:
         kiero::shutdown();

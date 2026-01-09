@@ -35,12 +35,24 @@ namespace offsets
 		inline uintptr_t RVA_GetCurrentBet = 0x7F0870; // Get Current Bet - ScheduleOne.Casino.SlotMachine.SlotMachineController$$get_CurrentBet
     }
     namespace equippable {
-        uintptr_t TrashGrabberGetCapacity = 0x8B4AD0; // ScheduleOne.Equipping.Equippable.TrashGrabber$$GetCapacity
+        inline uintptr_t TrashGrabberGetCapacity = 0x8B4AD0; // ScheduleOne.Equipping.Equippable.TrashGrabber$$GetCapacity
     }
     namespace player
     {
-		inline uintptr_t PlayerUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update
+        inline uintptr_t PlayerModelUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update
         inline uintptr_t StaticPlayerList = 0x20;// Player List offset
+
+        inline uintptr_t PlayerMovementUpdate = 0x66A720;
+        inline uintptr_t TakeDamage = 0x6F8CA0;
+
+        // VERIFIED OFFSETS
+        inline uintptr_t moveSpeed = 0x38;       // Multiplier
+        inline uintptr_t verticalVelocity = 0x9C; // The "Real" Jump/Gravity
+        inline uintptr_t isGrounded = 0xC8;       // Infinite Jump flag
+        inline uintptr_t stamina = 0x54;          // Stamina value
+
+        // COMBAT / SURVIVAL
+        inline uintptr_t RVA_TakeDamage = 0x6F8CA0;
 	}
     namespace atm
     {

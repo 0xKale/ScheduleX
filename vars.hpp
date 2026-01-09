@@ -45,6 +45,18 @@ namespace vars
 	// self options
 	inline bool bCanTakeDamage = false; // godmode
 
+    // Movement Category
+    inline uintptr_t pLocalPlayerController = 0;
+    inline uintptr_t pLocalPlayerModel = 0;
+
+    inline bool bModifyMovement = false;
+    inline bool bModifyPhysics = false;
+    inline bool bGodMode = false;
+
+    inline float fWalkSpeed = 1.0f;
+    inline float fJumpVelocity = 15.0f; // Set this higher for higher jumps
+    inline float fGravityScale = 1.0f;  // 1.0 = Normal, 0.5 = Low Gravity
+
     // Casino Options
     inline bool bAlwaysJackpot = false;   // Toggle for Jackpot
     inline bool bCustomBet = false;       // Toggle for Custom Bet
@@ -94,6 +106,6 @@ namespace vars
 
     //ESP COLORS
     inline float cPlayerBox[4] = { 1.0f, 0.0f, 0.0f, 1.0f }; // red
-    inline float cNpcBox[4] = { 1.0f, 1.0f, 0.0f, 1.0f }; // yellow
+    inline float cNpcBox[4] = { 0.0f, 1.0f, 0.0f, 1.0f }; // green
 	inline float cNpcName[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; // white
 }

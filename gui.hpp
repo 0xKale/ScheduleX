@@ -52,7 +52,18 @@ namespace gui
 
     inline void RenderSelfTab()
     {
-		ImGui::Checkbox("God Mode", &vars::bCanTakeDamage);
+        ImGui::TextColored(ImVec4(0, 1, 1, 1), "MOVEMENT");
+        ImGui::Separator();
+        ImGui::Checkbox("Enable Movement", &vars::bModifyMovement);
+        if (vars::bModifyMovement) {
+            ImGui::SliderFloat("Run Speed", &vars::fWalkSpeed, 1.0f, 15.0f, "%.1f x");
+            ImGui::SliderFloat("Jump Velocity", &vars::fJumpVelocity, 5.0f, 50.0f, "%.1f m/s");
+            ImGui::SliderFloat("Gravity Scale", &vars::fGravityScale, 0.0f, 1.0f, "%.2f G");
+        }
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Checkbox("God Mode", &vars::bGodMode);
+        ImGui::Checkbox("Infinite Stamina", &vars::bModifyPhysics);
     }
 
     inline void RenderPoliceTab()

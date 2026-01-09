@@ -1,8 +1,12 @@
 #pragma once
 #include "includes.h"
+#include <iostream>
+#include <iomanip>
+#include <map>
 
 namespace hooks
 {
+
 
     // cursor shit
     typedef void(__fastcall* tSetLockState)(int value, void* method);
@@ -31,7 +35,7 @@ namespace hooks
         }
         return oSetVisible(value, method);
     }
-	// il2cpp threading - getname fix
+    // il2cpp threading - getname fix
     typedef void* (*t_il2cpp_domain_get)();
     inline t_il2cpp_domain_get il2cpp_domain_get = nullptr;
 
@@ -71,7 +75,7 @@ namespace hooks
         return vars::bCustomStackLimit ? vars::iStackLimit : oGetStackLimit(__this);
     }
 
-	// can take damage - godmode
+    // can take damage - godmode
     typedef bool (*tGet_CanTakeDamage)(void* instance, void* method);
     tGet_CanTakeDamage o_get_CanTakeDamage = nullptr;
 
@@ -94,7 +98,7 @@ namespace hooks
     }
 
     //casino
-	// jackpot
+    // jackpot
     typedef int32_t(*tGetRandomSymbol)(void* method);
     tGetRandomSymbol o_GetRandomSymbol = nullptr;
 
@@ -106,7 +110,7 @@ namespace hooks
         return o_GetRandomSymbol(method);
     }
 
-	// custom bet
+    // custom bet
     typedef int32_t(*tGetCurrentBetAmount)(void* instance, void* method);
     tGetCurrentBetAmount o_GetCurrentBetAmount = nullptr;
 
@@ -118,7 +122,7 @@ namespace hooks
         return o_GetCurrentBetAmount(instance, method);
     }
 
-	// trash grabber capacity
+    // trash grabber capacity
     typedef int32_t(*tGetCapacity)(void* instance, void* method);
     inline tGetCapacity oGetCapacity = nullptr;
 
@@ -128,6 +132,56 @@ namespace hooks
         }
         return oGetCapacity(instance, method);
     }
+
+    //player modifiers 
+    typedef void(__fastcall* tPlayerMovementUpdate)(void* __this);
+    inline tPlayerMovementUpdate oPlayerMovementUpdate = nullptr;
+
+    inline void __fastcall hkPlayerMovementUpdate(void* __this)
+    {
+        if (oPlayerMovementUpdate) oPlayerMovementUpdate(__this);
+
+        if (!__this || (uintptr_t)__this < 0x10000) return;
+
+        uintptr_t base = (uintptr_t)__this;
+        vars::pLocalPlayerController = base;
+
+        __try {
+            if (vars::bModifyMovement)
+            {
+                *(float*)(base + offsets::player::moveSpeed) = vars::fWalkSpeed;
+                float currentVel = *(float*)(base + offsets::player::verticalVelocity);
+                if (GetAsyncKeyState(VK_SPACE) & 1)
+                {
+                    *(float*)(base + offsets::player::verticalVelocity) = vars::fJumpVelocity;
+                }
+                if (currentVel < -0.1f)
+                {
+                    *(float*)(base + offsets::player::verticalVelocity) = currentVel * vars::fGravityScale;
+                }
+            }
+
+            if (vars::bModifyPhysics) {
+                *(float*)(base + offsets::player::stamina) = 100.0f;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) {}
+    }
+
+
+    // add hook?
+    typedef void(__fastcall* tTakeDamage)(void* __this, float damage, void* method);
+    inline tTakeDamage oTakeDamage = nullptr;
+
+    inline void __fastcall hkTakeDamage(void* __this, float damage, void* method)
+    {
+        // If GodMode is on, you take 0 damage from all sources (including yourself)
+        if (vars::bGodMode) {
+            return; // Exit without calling original = No damage taken
+        }
+        return oTakeDamage(__this, damage, method);
+    }
+
 
     typedef float (*tGetRelevantBalance)(void* __this, void* method);
     inline tGetRelevantBalance oGetRelevantBalance = nullptr;
@@ -212,12 +266,11 @@ namespace hooks
     typedef Quaternion(__fastcall* tGetRotation)(void* transform);
     inline tGetRotation oGetRotation = nullptr;
 
-    // player update 
-    typedef void(__fastcall* tPlayerUpdate)(void* __this);
-    inline tPlayerUpdate oPlayerUpdate = nullptr;
+    // player update ESP
+    typedef void(__fastcall* tPlayerModelUpdate)(void* __this, void* method);
+    inline tPlayerModelUpdate oPlayerModelUpdate = nullptr;
 
-    inline void __fastcall hkPlayerUpdate(void* __this)
-    {
+    inline void __fastcall hkPlayerModelUpdate(void* __this, void* method) {
         if (__this)
         {
             void* Class = *(void**)__this;
@@ -230,7 +283,7 @@ namespace hooks
                 }
             }
         }
-        return oPlayerUpdate(__this);
+        return oPlayerModelUpdate(__this, method);
     }
 
 
@@ -349,7 +402,7 @@ namespace hooks
         CREATE_HOOK(offsets::debug::DebugValue, hkDebugValue, oDebugValue);
         CREATE_HOOK(offsets::localplayer::SetfieldOfView, hkSetfieldOfView, oSetfieldOfView);
         CREATE_HOOK(offsets::localplayer::GetStackLimit, hkGetStackLimit, oGetStackLimit);
-        CREATE_HOOK(offsets::player::PlayerUpdate, hkPlayerUpdate, oPlayerUpdate);
+        CREATE_HOOK(offsets::player::PlayerModelUpdate, hkPlayerModelUpdate, oPlayerModelUpdate);
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
 		//CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); // dont work no need to hook
 		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
@@ -363,6 +416,7 @@ namespace hooks
 		//CREATE_HOOK(offsets::atm::GetRemainingAllowedDeposit, hkGetRemainingDeposit, oGetRemainingDeposit);
         CREATE_HOOK(offsets::item::ItemGetValue, hkGetItemValue, oGetItemValue);
 		CREATE_HOOK(offsets::dealer::DealerPriceMultiplier, hkGetPriceMultiplier, oGetPriceMultiplier);
+        CREATE_HOOK(offsets::player::PlayerMovementUpdate, hkPlayerMovementUpdate, oPlayerMovementUpdate);
 
         
 
