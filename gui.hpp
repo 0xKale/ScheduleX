@@ -24,6 +24,11 @@ namespace gui
         }
     }
 
+    inline void RenderSelfTab()
+    {
+		ImGui::Checkbox("God Mode", &vars::bCanTakeDamage);
+    }
+
     inline void RenderEspTab()
     {
         ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
@@ -102,6 +107,12 @@ namespace gui
                     RenderQoLTab();
                     ImGui::EndTabItem();
                 }
+
+                if (ImGui::BeginTabItem("Self"))
+                {
+                    RenderSelfTab();
+                    ImGui::EndTabItem();
+				}
 
                 if (ImGui::BeginTabItem("ESP"))
                 {

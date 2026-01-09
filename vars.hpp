@@ -37,6 +37,8 @@ namespace vars
     inline bool bCustomStackLimit = false;
 	inline int iStackLimit = 20; // default stack limit 20
 
+	inline bool bCanTakeDamage = false; // godmode
+
 
     // debug shit
     inline bool bDebug = false;

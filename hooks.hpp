@@ -69,6 +69,28 @@ namespace hooks
         return vars::bCustomStackLimit ? vars::iStackLimit : oGetStackLimit(__this);
     }
 
+	// can take damage - godmode
+    typedef bool (*tGet_CanTakeDamage)(void* instance, void* method);
+    tGet_CanTakeDamage o_get_CanTakeDamage = nullptr;
+
+    bool hk_get_CanTakeDamage(void* instance, void* method) {
+        if (vars::bCanTakeDamage) {
+            return false;
+        }
+        return o_get_CanTakeDamage(instance, method);
+    }
+
+    typedef void (*tRpcTakeDamage)(void* instance, float damage, bool flinch, bool playBloodMist, void* method);
+    tRpcTakeDamage o_RpcTakeDamage = nullptr;
+
+    void hk_RpcTakeDamage(void* instance, float damage, bool flinch, bool playBloodMist, void* method)
+    {
+        if (vars::bCanTakeDamage) {
+            damage = 0.0f;
+        }
+        o_RpcTakeDamage(instance, damage, flinch, playBloodMist, method);
+    }
+
     // w2s
     typedef Vector3(__fastcall* tWorldToScreenPoint)(void* camera, Vector3 pos, int eye);
     inline tWorldToScreenPoint oWorldToScreenPoint = nullptr;
@@ -199,5 +221,7 @@ namespace hooks
         CREATE_HOOK(offsets::localplayer::GetStackLimit, hkGetStackLimit, oGetStackLimit);
         CREATE_HOOK(offsets::player::PlayerUpdate, hkPlayerUpdate, oPlayerUpdate);
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
+		//CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); // dont work no need to hook
+		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
     }
 }
