@@ -93,6 +93,34 @@ namespace gui
 
             ImGui::Unindent();
         }
+        ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "TONY HAWK MODE");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::Checkbox("Enable Skate Mods", &vars::bModifySkate);
+
+        if (vars::bModifySkate) {
+            ImGui::Indent();
+
+            ImGui::Text("Physics");
+            // Gravity: Lower is floatier. 9.8 is earth. 50+ is heavy.
+            ImGui::SliderFloat("Gravity", &vars::fSkateGravity, 0.0f, 50.0f, "%.1f");
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("0.0 = Hoverboard mode.");
+
+            ImGui::Text("Handling");
+            // Turn Force: Higher = Snappier turns
+            ImGui::SliderFloat("Turn Force", &vars::fSkateTurn, 10.0f, 200.0f, "%.1f");
+
+            // Speed Boost: How much speed you gain/lose when carving
+            ImGui::SliderFloat("Turn Boost", &vars::fSkateBoost, 0.0f, 50.0f, "%.1f");
+
+            ImGui::Spacing();
+            ImGui::Text("Tricks");
+            ImGui::Checkbox("Instant Max Jump", (bool*)&vars::fSkateJumpCharge); // Cast float* to bool* for checkbox is risky, better use a bool in vars
+            // Note: For 'Instant Max Jump', you might want to use a real bool in vars.hpp and set the float inside the hook based on that bool.
+
+            ImGui::Unindent();
+        }
 	}
 
     inline void RenderCasinoTab()

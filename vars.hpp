@@ -114,4 +114,13 @@ namespace vars
     // world tab 
     inline bool bModifyWorld = false;
     inline float fGrowMultiplier = 1.0f;
+
+
+    // SKATING VARIABLES
+    inline bool bModifySkate = false;
+    inline bool bInstantJump = false;
+    inline float fSkateGravity = 20.0f;    // Normal gravity
+    inline float fSkateTurn = 50.0f;       // Turning sharpness
+    inline float fSkateBoost = 10.0f;      // Speed gain while turning
+    inline float fSkateJumpCharge = 0.0f;  // Instant Jump Charge
 }

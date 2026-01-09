@@ -315,6 +315,33 @@ namespace hooks
         return oGetTempMult(__this, method);
     }
 
+    typedef void(__fastcall* tSkateEffectsUpdate)(void* __this);
+    inline tSkateEffectsUpdate oSkateEffectsUpdate = nullptr;
+
+    inline void __fastcall hkSkateEffectsUpdate(void* __this)
+    {
+        if (oSkateEffectsUpdate) oSkateEffectsUpdate(__this);
+
+        if (!__this || (uintptr_t)__this < 0x10000) return;
+        if (vars::bModifySkate)
+        {
+            uintptr_t board = *(uintptr_t*)((uintptr_t)__this + offsets::skating::boardInstance);
+            if (board > 0x10000)
+            {
+                *(float*)(board + offsets::skating::gravity) = vars::fSkateGravity;
+                *(float*)(board + offsets::skating::turnForce) = vars::fSkateTurn;
+                *(float*)(board + offsets::skating::turnSpeedBoost) = vars::fSkateBoost;
+                if (vars::bInstantJump)
+                {
+                    float currentCharge = *(float*)(board + offsets::skating::jumpCharge);
+                    if (currentCharge > 0.01f) {
+                        *(float*)(board + offsets::skating::jumpCharge) = 1.0f;
+                    }
+                }
+            }
+        }
+    }
+
 	// get name for NPCs
     typedef void* (__fastcall* tGetName)(void* object);
     inline tGetName oGetName = nullptr;
@@ -434,6 +461,7 @@ namespace hooks
         CREATE_HOOK(offsets::player::PlayerMovementUpdate, hkPlayerMovementUpdate, oPlayerMovementUpdate);
 		//CREATE_HOOK(offsets::player::TakeDamage, hkTakeDamage, oTakeDamage); // shitt
 		CREATE_HOOK(offsets::world::GetTempMultiplier, hkGetTempMult, oGetTempMult);
+		CREATE_HOOK(offsets::skating::EffectsFixedUpdate, hkSkateEffectsUpdate, oSkateEffectsUpdate);
 
 
         

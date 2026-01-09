@@ -79,4 +79,22 @@ namespace offsets
     {
         inline uintptr_t GetTempMultiplier = 0xA3FA20; //ScheduleOne.Growing.GrowContainer$$GetTemperatureGrowthMultiplier
     }
+    namespace skating {
+        // Class: ScheduleOne.Skating.SkateboardEffects
+        // Function: FixedUpdate
+        // RVA: 0xAC2CA0
+        inline uintptr_t EffectsFixedUpdate = 0xAC2CA0; // ScheduleOne_Skating_SkateboardEffects$$FixedUpdate
+
+        // Field: private Skateboard skateboard; // 0x20
+        inline uintptr_t boardInstance = 0x20;
+
+        // --- SKATEBOARD CLASS OFFSETS ---
+        // Class: ScheduleOne.Skating.Skateboard
+        inline uintptr_t currentSpeed = 0x118; // float
+        inline uintptr_t jumpCharge = 0x120; // float
+        inline uintptr_t turnForce = 0x188; // float
+        inline uintptr_t turnSpeedBoost = 0x194; // float
+        inline uintptr_t gravity = 0x1A0; // float
+        inline uintptr_t brakeForce = 0x1A4; // float
+    }
 }
