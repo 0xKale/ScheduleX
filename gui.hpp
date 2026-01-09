@@ -114,7 +114,34 @@ namespace gui
 
     inline void RenderPoliceTab()
     {
-        // Future Police Tab Features
+        ImGui::TextColored(ImVec4(0, 0.5f, 1, 1), "[ LAW ENFORCEMENT ]");
+        ImGui::Separator();
+        ImGui::Checkbox("MASTER SWITCH", &vars::bModifyPolice);
+
+        if (vars::bModifyPolice)
+        {
+            ImGui::Indent();
+            ImGui::Spacing();
+
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "AI BEHAVIOR");
+            ImGui::Checkbox("Ghost Mode (No Search)", &vars::bNoSearch);
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Police cannot initiate arrest logic.");
+
+            ImGui::Checkbox("Lazy Cops (Ignore All)", &vars::bPoliceIgnoreAll);
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Police ignore the entire world.");
+
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "COMBAT");
+            ImGui::Checkbox("Pacifist Mode", &vars::bPacifistPolice);
+            ImGui::Checkbox("Disarm Police", &vars::bDisarmPolice);
+
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "STATUS");
+            ImGui::Checkbox("Anti-Arrest", &vars::bAntiJail);
+            ImGui::Checkbox("Freeze Police", &vars::bFreezePolice);
+
+            ImGui::Unindent();
+        }
 	}
 
     inline void RenderWorldTab()

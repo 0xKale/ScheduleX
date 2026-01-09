@@ -150,6 +150,16 @@ namespace vars
     // hover
     inline bool  bHoverMode = false;         // Enable hovering.
     inline float fHoverHeight = 0.2f;        // Height in meters.
+
+
+	//police stuff
+    inline bool bModifyPolice = false;
+    inline bool bNoSearch = false;
+    inline bool bPoliceIgnoreAll = false;
+    inline bool bFreezePolice = false;
+    inline bool bDisarmPolice = false;
+    inline bool bPacifistPolice = false;
+    inline bool bAntiJail = false;
 }
 
 namespace defaults

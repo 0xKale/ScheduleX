@@ -366,6 +366,57 @@ namespace hooks
         }
     }
 
+    // police stuff 
+
+     // 1. FREEZE POLICE
+    typedef void(__fastcall* tOfficerUpdate)(void* __this, void* method);
+    inline tOfficerUpdate oOfficerUpdate = nullptr;
+    inline void __fastcall hkOfficerUpdate(void* __this, void* method) {
+        if (vars::bFreezePolice) return;
+        if (oOfficerUpdate) oOfficerUpdate(__this, method);
+    }
+
+    // 2. GHOST MODE (Arrest Logic)
+    typedef bool(__fastcall* tCanInvestigatePlayer)(void* __this, void* player, void* method);
+    inline tCanInvestigatePlayer oCanInvestigatePlayer = nullptr;
+    inline bool __fastcall hkCanInvestigatePlayer(void* __this, void* player, void* method) {
+        if (vars::bNoSearch) return false;
+        if (oCanInvestigatePlayer) return oCanInvestigatePlayer(__this, player, method);
+        return false;
+    }
+
+    // 3. LAZY COPS (Ignore All)
+    typedef bool(__fastcall* tCanInvestigate)(void* __this, void* method);
+    inline tCanInvestigate oCanInvestigate = nullptr;
+    inline bool __fastcall hkCanInvestigate(void* __this, void* method) {
+        if (vars::bPoliceIgnoreAll) return false;
+        if (oCanInvestigate) return oCanInvestigate(__this, method);
+        return true;
+    }
+
+    // 4. DISABLE LETHAL (Guns)
+    typedef void(__fastcall* tUpdateLethal)(void* __this);
+    inline tUpdateLethal oUpdateLethal = nullptr;
+    inline void __fastcall hkUpdateLethal(void* __this) {
+        if (vars::bDisarmPolice || vars::bPacifistPolice) return;
+        if (oUpdateLethal) oUpdateLethal(__this);
+    }
+
+    // 5. DISABLE NON-LETHAL (Tazers)
+    typedef void(__fastcall* tUpdateNonLethal)(void* __this);
+    inline tUpdateNonLethal oUpdateNonLethal = nullptr;
+    inline void __fastcall hkUpdateNonLethal(void* __this) {
+        if (vars::bDisarmPolice || vars::bPacifistPolice) return;
+        if (oUpdateNonLethal) oUpdateNonLethal(__this);
+    }
+
+    // 6. ANTI-ARREST (Cuffing)
+    typedef void(__fastcall* tUpdateArrest)(void* __this);
+    inline tUpdateArrest oUpdateArrest = nullptr;
+    inline void __fastcall hkUpdateArrest(void* __this) {
+        if (vars::bAntiJail || vars::bNoSearch) return;
+        if (oUpdateArrest) oUpdateArrest(__this);
+    }
 	// get name for NPCs
     typedef void* (__fastcall* tGetName)(void* object);
     inline tGetName oGetName = nullptr;
@@ -471,9 +522,9 @@ namespace hooks
         CREATE_HOOK(offsets::player::PlayerModelUpdate, hkPlayerModelUpdate, oPlayerModelUpdate);
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
 		CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); 
-		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
-        CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
-		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
+		CREATE_HOOK(offsets::localplayer::RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
+        CREATE_HOOK(offsets::casino::GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
+		CREATE_HOOK(offsets::casino::GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
 		//CREATE_HOOK(offsets::localplayer::GrassUpdate, hkGrassPlayerUpdate, oGrassPlayerUpdate); // dont work to stop player moving when menu open
         CREATE_HOOK(offsets::equippable::TrashGrabberGetCapacity, hkGetCapacity, oGetCapacity);
 		//CREATE_HOOK(offsets::atm::GetRelevantBalance, hkGetRelevantBalance, oGetRelevantBalance);
@@ -486,6 +537,14 @@ namespace hooks
 		//CREATE_HOOK(offsets::player::TakeDamage, hkTakeDamage, oTakeDamage); // shitt
 		CREATE_HOOK(offsets::world::GetTempMultiplier, hkGetTempMult, oGetTempMult);
 		CREATE_HOOK(offsets::skating::EffectsFixedUpdate, hkSkateEffectsUpdate, oSkateEffectsUpdate);
+
+        //police 
+        CREATE_HOOK(offsets::police::OfficerUpdate, hkOfficerUpdate, oOfficerUpdate);
+        CREATE_HOOK(offsets::police::CanInvestigatePlayer, hkCanInvestigatePlayer, oCanInvestigatePlayer);
+        CREATE_HOOK(offsets::police::CanInvestigate, hkCanInvestigate, oCanInvestigate);
+        CREATE_HOOK(offsets::police::UpdateLethalBehaviour, hkUpdateLethal, oUpdateLethal);
+        CREATE_HOOK(offsets::police::UpdateNonLethalBehaviour, hkUpdateNonLethal, oUpdateNonLethal);
+        CREATE_HOOK(offsets::police::UpdateArrestBehaviour, hkUpdateArrest, oUpdateArrest);
 
 
         

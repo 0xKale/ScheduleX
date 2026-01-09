@@ -4,7 +4,7 @@
 
 namespace offsets
 {
-    inline uintptr_t base = (uintptr_t)GetModuleHandle(NULL);
+    inline uintptr_t base = (uintptr_t)GetModuleHandleA("GameAssembly.dll");
     inline uintptr_t GameAssembly = 0;
 
     namespace localplayer
@@ -12,7 +12,7 @@ namespace offsets
         inline uintptr_t SetfieldOfView = 0x2C841A0; // FOV - UnityEngine.Camera$$set_fieldOfVie
         inline uintptr_t GetStackLimit = 0x997CC0;// Stack Limit - ScheduleOne.ItemFramework.ItemInstance$$get_StackLimit
 		inline uintptr_t CanTakeDamage = 0x66485; // Can Take Damage - ScheduleOne.PlayerScripts.Health.PlayerHealth$$get_CanTakeDamage // dont give godmode
-		inline uintptr_t RVA_RpcTakeDamage = 0x663110; // Set Can Take Damage - ScheduleOne.PlayerScripts.Health.PlayerHealth$$set_CanTakeDamage
+        inline uintptr_t RpcTakeDamage = 0x663110; // ScheduleOne.PlayerScripts.Health.PlayerHealth$$set_CanTakeDamage
 		inline uintptr_t GrassUpdate = 0x7B4F40; // StylizedGrassDemo_PlayerController$$Update
     }
     namespace debug
@@ -31,8 +31,8 @@ namespace offsets
     }
     namespace casino
     {
-		inline uintptr_t RVA_GetRandomSymbol = 0x7EE610; // Get Random Symbol - ScheduleOne.Casino.SlotMachine.SlotMachineReel$$GetRandomSymbol
-		inline uintptr_t RVA_GetCurrentBet = 0x7F0870; // Get Current Bet - ScheduleOne.Casino.SlotMachine.SlotMachineController$$get_CurrentBet
+		inline uintptr_t GetRandomSymbol = 0x7EE610; // Get Random Symbol - ScheduleOne.Casino.SlotMachine.SlotMachineReel$$GetRandomSymbol
+		inline uintptr_t GetCurrentBet = 0x7F0870; // Get Current Bet - ScheduleOne.Casino.SlotMachine.SlotMachineController$$get_CurrentBet
     }
     namespace equippable {
         inline uintptr_t TrashGrabberGetCapacity = 0x8B4AD0; // ScheduleOne.Equipping.Equippable.TrashGrabber$$GetCapacity
@@ -50,9 +50,6 @@ namespace offsets
         inline uintptr_t verticalVelocity = 0x9C; // The "Real" Jump/Gravity
         inline uintptr_t isGrounded = 0xC8;       // Infinite Jump flag
         inline uintptr_t stamina = 0x54;          // Stamina value
-
-        // COMBAT / SURVIVAL
-        inline uintptr_t RVA_TakeDamage = 0x6F8CA0;
 	}
     namespace atm
     {
@@ -74,6 +71,7 @@ namespace offsets
     {
 		inline uintptr_t MovementUpdate = 0x7254D0; // NPC Movement Update - NPC.NPCModel$$MovementUpdate
 		inline uintptr_t AddCash = 0x704AC0; // NPC Add Cash - NPC.NPCModel$$AddCash
+        inline uintptr_t CanSeeTarget = 0x7A9520;// ScheduleOne.NPCs.NPCAwareness$$CanSeeTarget 
     }
     namespace world
     {
@@ -119,5 +117,22 @@ namespace offsets
         inline uintptr_t hoverForce = 0x1FC; // float: Upward lifting force
         inline uintptr_t hoverRayLen = 0x200; // float: How far down to look for ground
         inline uintptr_t hoverHeight = 0x204; // float: Target floating height
+    }
+    namespace police
+    {
+        // Police Officer
+        inline uintptr_t CanInvestigatePlayer = 0x7E5F10; // ScheduleOne_Police_PoliceOfficer$$CanInvestigatePlayer
+        inline uintptr_t CanInvestigate = 0x7E5FE0; // ScheduleOne_Police_PoliceOfficer$$CanInvestigate
+        inline uintptr_t OfficerUpdate = 0x7E9D30; // ScheduleOne_Police_PoliceOfficer$$Update
+
+        // Behaviour
+        inline uintptr_t UpdateLethalBehaviour = 0x76CDC0; // ScheduleOne_NPCs_Behaviour_PursuitBehaviour$$UpdateLethalBehaviour
+        inline uintptr_t UpdateNonLethalBehaviour = 0x76CEA0; // ScheduleOne_NPCs_Behaviour_PursuitBehaviour$$UpdateNonLethalBehaviour
+        inline uintptr_t UpdateArrestBehaviour = 0x76C2D0; // ScheduleOne_NPCs_Behaviour_PursuitBehaviour$$UpdateArrestBehaviour
+    }
+
+    namespace law
+    {
+        inline uintptr_t SetCheckpointEnabled = 0x60CBB0; // ScheduleOne_Law_CheckpointManager$$SetCheckpointEnabled
     }
 }
