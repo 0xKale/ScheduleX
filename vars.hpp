@@ -13,6 +13,10 @@ struct Vector2 {
     float x, y;
 };
 
+struct Quaternion {
+    float x, y, z, w;
+};
+
 namespace vars
 {
 
@@ -58,8 +62,9 @@ namespace vars
     inline bool bDrawBox = false; // Toggle for Boxes
 	inline bool bPlayerEsp = false; // Toggle for Player ESP
     inline bool bNpcEsp = false; // Toggle for NPC ESP
-    inline bool bDrawNpcBox = true;   // Specific Toggle for NPC Boxes
-    inline bool bDrawNpcName = true;  // Specific Toggle for NPC Names
+    inline bool bDrawNpcBox2D = true;   // Specific Toggle for NPC Boxes
+    inline bool bDrawNpcBox3D = false;   // Specific Toggle for NPC Boxes
+    inline bool bDrawNpcName = false;  // Specific Toggle for NPC Names
 
 
 

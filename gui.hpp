@@ -65,8 +65,13 @@ namespace gui
             if (vars::bNpcEsp)
             {
                 ImGui::Indent(); 
-                ImGui::Checkbox("Draw Boxes", &vars::bDrawNpcBox);
-                if (vars::bDrawNpcBox) {
+                ImGui::Checkbox("Draw Boxes 2D", &vars::bDrawNpcBox2D);
+                if (vars::bDrawNpcBox2D) {
+                    ImGui::SameLine();
+                    ImGui::ColorEdit4("##NpcBoxColor", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                }
+                ImGui::Checkbox("Draw Boxes 3D (Scuffed)", &vars::bDrawNpcBox3D);
+                if (vars::bDrawNpcBox3D) {
                     ImGui::SameLine();
                     ImGui::ColorEdit4("##NpcBoxColor", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
                 }

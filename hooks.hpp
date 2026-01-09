@@ -134,6 +134,10 @@ namespace hooks
         screenPos.y = ImGui::GetIO().DisplaySize.y - result.y; // Flip Y for ImGui
         return true;
     }
+    
+    // get rotation for 3d boxes
+    typedef Quaternion(__fastcall* tGetRotation)(void* transform);
+    inline tGetRotation oGetRotation = nullptr;
 
     // player update 
     typedef void(__fastcall* tPlayerUpdate)(void* __this);
@@ -255,6 +259,7 @@ namespace hooks
 		oGetTransform = (tGetTransform)(offsets::GameAssembly + offsets::unity::GetTransform); // Player Transform
 		oGetPosition = (tGetPosition)(offsets::GameAssembly + offsets::unity::GetPosition); // Transform Position
 		oGetName = (tGetName)(offsets::GameAssembly + offsets::unity::GetName); // Get Name
+        oGetRotation = (tGetRotation)(offsets::GameAssembly + offsets::unity::GetRotation); // get rotation
 
         // macro for qol 
         #define CREATE_HOOK(addr, hook, orig) \
@@ -273,5 +278,6 @@ namespace hooks
         CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
 		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
 		//CREATE_HOOK(offsets::localplayer::GrassUpdate, hkGrassPlayerUpdate, oGrassPlayerUpdate); // dont work to stop player moving when menu open
+        
     }
 }

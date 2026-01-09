@@ -27,6 +27,7 @@ namespace offsets
         inline uintptr_t GetTransform = 0x2CBA530; // Player Transform - UnityEngine.Component$$get_transform
         inline uintptr_t GetPosition = 0x2CCEAD0; // Transform Position - UnityEngine.Transform$$get_position
 		inline uintptr_t GetName = 0x2CC20E0; // GameObject Name - UnityEngine.GameObject$$get_name
+        inline uintptr_t GetRotation = 0x2CCEC40; // get rotation - UnityEngine_Transform$$get_rotation
     }
     namespace casino
     {

@@ -15,6 +15,83 @@ namespace esp
         );
     }
 
+    void Draw3DBox(Vector3 center, float w, float h, float d, ImColor color) {
+        // Define the 8 corners of the cube in 3D space
+        Vector3 corners[8] = {
+            { center.x - w, center.y, center.z - d }, { center.x + w, center.y, center.z - d },
+            { center.x - w, center.y, center.z + d }, { center.x + w, center.y, center.z + d },
+            { center.x - w, center.y + h, center.z - d }, { center.x + w, center.y + h, center.z - d },
+            { center.x - w, center.y + h, center.z + d }, { center.x + w, center.y + h, center.z + d }
+        };
+
+        ImVec2 screenCorners[8];
+        for (int i = 0; i < 8; i++) {
+            // Use your existing GetScreenPos function
+            if (!hooks::GetScreenPos(corners[i], screenCorners[i])) return;
+        }
+
+        // Draw the 12 lines connecting the corners
+        auto drawList = ImGui::GetBackgroundDrawList();
+        for (int i = 0; i < 4; i++) {
+            drawList->AddLine(screenCorners[i], screenCorners[i + 4], color); // Vertical pillars
+            drawList->AddLine(screenCorners[i], screenCorners[(i + 1) % 4], color); // Bottom square
+            drawList->AddLine(screenCorners[i + 4], screenCorners[((i + 1) % 4) + 4], color); // Top square
+        }
+    }
+
+    Vector3 RotateVectorByQuaternion(Vector3 v, Quaternion q) {
+        Vector3 u = { q.x, q.y, q.z };
+        float s = q.w;
+
+        Vector3 cross_uv = {
+            u.y * v.z - u.z * v.y,
+            u.z * v.x - u.x * v.z,
+            u.x * v.y - u.y * v.x
+        };
+        Vector3 cross_u_uv = {
+            u.y * cross_uv.z - u.z * cross_uv.y,
+            u.z * cross_uv.x - u.x * cross_uv.z,
+            u.x * cross_uv.y - u.y * cross_uv.x
+        };
+        return {
+            v.x + 2.0f * (s * cross_uv.x + cross_u_uv.x),
+            v.y + 2.0f * (s * cross_uv.y + cross_u_uv.y),
+            v.z + 2.0f * (s * cross_uv.z + cross_u_uv.z)
+        };
+    }
+
+    void DrawOriented3DBox(void* npc, float w, float h, float d, ImColor color) {
+        void* transform = hooks::oGetTransform(npc);
+        if (!transform) return;
+
+        Vector3 origin = hooks::oGetPosition(transform);
+        Quaternion rotation = hooks::oGetRotation(transform);
+
+        // Define 8 corners relative to the origin (Local Space)
+        Vector3 localCorners[8] = {
+            { -w, 0, -d }, { w, 0, -d }, { -w, 0, d }, { w, 0, d },
+            { -w, h, -d }, { w, h, -d }, { -w, h, d }, { w, h, d }
+        };
+
+        ImVec2 screenCorners[8];
+        for (int i = 0; i < 8; i++) {
+            // 1. Rotate the point
+            Vector3 rotated = RotateVectorByQuaternion(localCorners[i], rotation);
+            // 2. Translate to world position
+            Vector3 worldPos = { origin.x + rotated.x, origin.y + rotated.y, origin.z + rotated.z };
+            // 3. Project to screen
+            if (!hooks::GetScreenPos(worldPos, screenCorners[i])) return;
+        }
+
+        // Draw lines (same logic as previous 3D box)
+        auto drawList = ImGui::GetBackgroundDrawList();
+        for (int i = 0; i < 4; i++) {
+            drawList->AddLine(screenCorners[i], screenCorners[i + 4], color);
+            drawList->AddLine(screenCorners[i], screenCorners[(i + 1) % 4], color);
+            drawList->AddLine(screenCorners[i + 4], screenCorners[((i + 1) % 4) + 4], color);
+        }
+    }
+
     // Unity List Struct (For PlayerList)
     template<typename T>
     struct UnityList {
@@ -137,6 +214,8 @@ namespace esp
 
                 Vector3 worldPos = hooks::oGetPosition(transform);
 
+
+
                 ImVec2 footPos;
                 if (hooks::GetScreenPos(worldPos, footPos))
                 {
@@ -151,8 +230,11 @@ namespace esp
                         float x = footPos.x - (width / 2.0f);
                         float y = headPos.y;
 
-                        if (vars::bDrawNpcBox) {
+                        if (vars::bDrawNpcBox2D) {
                             DrawBox(x, y, width, height, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2])); // draw npc box
+                        }
+                        if (vars::bDrawNpcBox3D) {
+                            Draw3DBox(worldPos, 0.4f, 1.8f, 0.4f, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2])); // draw npc box 3d
                         }
                         if (vars::bDrawNpcName)
                         {
@@ -166,5 +248,6 @@ namespace esp
                 }
             }
         }
+        //vars::vNpcList.clear();
     }
 }
