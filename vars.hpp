@@ -26,8 +26,9 @@ namespace vars
 
     // menu states
     inline bool bShowMenu = true;
-    inline int iLastGameLockState = 1; // Default Locked
-    inline bool bLastCursorVisible = false;
+    inline int iLastGameLockState = 0; // Default Locked
+    inline bool bLastCursorVisible = true;
+    inline bool bWatermark = true;
 
     // options
     inline bool bCustomFieldOfView = false;
@@ -48,6 +49,10 @@ namespace vars
     inline bool bDrawBox = false; // Toggle for Boxes
 	inline bool bPlayerEsp = false; // Toggle for Player ESP
     inline bool bNpcEsp = false; // Toggle for NPC ESP
+    inline bool bDrawNpcBox = true;   // Specific Toggle for NPC Boxes
+    inline bool bDrawNpcName = true;  // Specific Toggle for NPC Names
+
+
 
 	inline void* pPlayerList = nullptr;// player list
 	inline void* pLocalPlayer = nullptr; // local player

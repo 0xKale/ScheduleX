@@ -6,7 +6,7 @@ namespace gui
     inline void RenderQoLTab()
     {
         ImGui::Checkbox("Debug", &vars::bDebug);
-
+        ImGui::Checkbox("Show Watermark", &vars::bWatermark);
 
         ImGui::Separator();
         ImGui::Checkbox("Custom FOV", &vars::bCustomFieldOfView);
@@ -26,21 +26,27 @@ namespace gui
 
     inline void RenderEspTab()
     {
-        ImGui::Checkbox("Enable Master ESP", &vars::bEspEnabled);
-
+        ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
         if (vars::bEspEnabled)
         {
-            ImGui::Indent();
-            ImGui::Checkbox("Draw Boxes", &vars::bDrawBox);
-
+            ImGui::Spacing();
             ImGui::Checkbox("Show NPCs", &vars::bNpcEsp);
-            if (vars::bNpcEsp) {
-                ImGui::Indent();
-                ImGui::ColorEdit4("NPC Box Color", vars::cNpcBox, ImGuiColorEditFlags_NoInputs);
-                ImGui::ColorEdit4("NPC Name Color", vars::cNpcName, ImGuiColorEditFlags_NoInputs);
+            if (vars::bNpcEsp)
+            {
+                ImGui::Indent(); 
+                ImGui::Checkbox("Draw Boxes", &vars::bDrawNpcBox);
+                if (vars::bDrawNpcBox) {
+                    ImGui::SameLine();
+                    ImGui::ColorEdit4("##NpcBoxColor", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                }
+                ImGui::Checkbox("Draw Name", &vars::bDrawNpcName);
+                if (vars::bDrawNpcName) {
+                    ImGui::SameLine();
+                    ImGui::ColorEdit4("##NpcNameColor", vars::cNpcName, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                }
+
                 ImGui::Unindent();
             }
-            ImGui::Unindent();
         }
     }
 

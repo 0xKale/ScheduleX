@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <string>
+#include <ctime>
 
 // ImGui
 #include "imgui/imgui.h"
