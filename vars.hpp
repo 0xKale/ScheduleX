@@ -109,4 +109,9 @@ namespace vars
     inline float cPlayerBox[4] = { 1.0f, 0.0f, 0.0f, 1.0f }; // red
     inline float cNpcBox[4] = { 0.0f, 1.0f, 0.0f, 1.0f }; // green
 	inline float cNpcName[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; // white
+
+
+    // world tab 
+    inline bool bModifyWorld = false;
+    inline float fGrowMultiplier = 1.0f;
 }

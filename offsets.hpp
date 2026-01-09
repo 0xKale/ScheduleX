@@ -75,4 +75,8 @@ namespace offsets
 		inline uintptr_t MovementUpdate = 0x7254D0; // NPC Movement Update - NPC.NPCModel$$MovementUpdate
 		inline uintptr_t AddCash = 0x704AC0; // NPC Add Cash - NPC.NPCModel$$AddCash
     }
+    namespace world
+    {
+        inline uintptr_t GetTempMultiplier = 0xA3FA20; //ScheduleOne.Growing.GrowContainer$$GetTemperatureGrowthMultiplier
+    }
 }

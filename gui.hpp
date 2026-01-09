@@ -72,6 +72,29 @@ namespace gui
         // Future Police Tab Features
 	}
 
+    inline void RenderWorldTab()
+    {
+        ImGui::TextColored(ImVec4(0, 1, 0.5f, 1), "GROWTH OVERCLOCK");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::Checkbox("Enable World Hacks", &vars::bModifyWorld);
+
+        if (vars::bModifyWorld) {
+            ImGui::Indent();
+
+            ImGui::Text("Temperature Efficiency Multiplier");
+
+            ImGui::SliderFloat("##Speed", &vars::fGrowMultiplier, 1.0f, 100.0f, "%.2f x");
+
+            if (vars::fGrowMultiplier >= 10.0f) {
+                ImGui::TextColored(ImVec4(0, 1, 0, 1), "Plants will grow in seconds.");
+            }
+
+            ImGui::Unindent();
+        }
+	}
+
     inline void RenderCasinoTab()
     {
         ImGui::Spacing();
@@ -199,6 +222,12 @@ namespace gui
                     RenderPoliceTab();
                     ImGui::EndTabItem();
 				}
+
+                if (ImGui::BeginTabItem("World"))
+                {
+                    RenderWorldTab();
+                    ImGui::EndTabItem();
+                }
 
                 if (ImGui::BeginTabItem("Casino"))
                 {

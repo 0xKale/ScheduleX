@@ -302,6 +302,18 @@ namespace hooks
 
         return oGrassPlayerUpdate(__this, method);
     }
+    //world 
+    typedef float(__fastcall* tGetTempMult)(void* __this, void* method);
+    inline tGetTempMult oGetTempMult = nullptr;
+
+    inline float __fastcall hkGetTempMult(void* __this, void* method)
+    {
+        if (vars::bModifyWorld && vars::fGrowMultiplier > 1.0f)
+        {
+            return vars::fGrowMultiplier;
+        }
+        return oGetTempMult(__this, method);
+    }
 
 	// get name for NPCs
     typedef void* (__fastcall* tGetName)(void* object);
@@ -420,7 +432,9 @@ namespace hooks
         CREATE_HOOK(offsets::item::ItemGetValue, hkGetItemValue, oGetItemValue);
 		CREATE_HOOK(offsets::dealer::DealerPriceMultiplier, hkGetPriceMultiplier, oGetPriceMultiplier);
         CREATE_HOOK(offsets::player::PlayerMovementUpdate, hkPlayerMovementUpdate, oPlayerMovementUpdate);
-		//CREATE_HOOK(offsets::player::TakeDamage, hkTakeDamage, oTakeDamage); // shitty
+		//CREATE_HOOK(offsets::player::TakeDamage, hkTakeDamage, oTakeDamage); // shitt
+		CREATE_HOOK(offsets::world::GetTempMultiplier, hkGetTempMult, oGetTempMult);
+
 
         
 
