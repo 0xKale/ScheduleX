@@ -91,6 +91,31 @@ namespace hooks
         o_RpcTakeDamage(instance, damage, flinch, playBloodMist, method);
     }
 
+    //casino
+	// jackpot
+    typedef int32_t(*tGetRandomSymbol)(void* method);
+    tGetRandomSymbol o_GetRandomSymbol = nullptr;
+
+    int32_t hk_GetRandomSymbol(void* method)
+    {
+        if (vars::bAlwaysJackpot) {
+            return 5;
+        }
+        return o_GetRandomSymbol(method);
+    }
+
+	// custom bet
+    typedef int32_t(*tGetCurrentBetAmount)(void* instance, void* method);
+    tGetCurrentBetAmount o_GetCurrentBetAmount = nullptr;
+
+    int32_t hk_GetCurrentBetAmount(void* instance, void* method)
+    {
+        if (vars::bCustomBet) {
+            return vars::iBetAmount;
+        }
+        return o_GetCurrentBetAmount(instance, method);
+    }
+
     // w2s
     typedef Vector3(__fastcall* tWorldToScreenPoint)(void* camera, Vector3 pos, int eye);
     inline tWorldToScreenPoint oWorldToScreenPoint = nullptr;
@@ -223,5 +248,7 @@ namespace hooks
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
 		//CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); // dont work no need to hook
 		CREATE_HOOK(offsets::localplayer::RVA_RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
+        CREATE_HOOK(offsets::casino::RVA_GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
+		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
     }
 }

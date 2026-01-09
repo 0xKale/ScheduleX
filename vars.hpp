@@ -37,7 +37,14 @@ namespace vars
     inline bool bCustomStackLimit = false;
 	inline int iStackLimit = 20; // default stack limit 20
 
+
+	// self options
 	inline bool bCanTakeDamage = false; // godmode
+
+    // Casino Options
+    inline bool bAlwaysJackpot = false;   // Toggle for Jackpot
+    inline bool bCustomBet = false;       // Toggle for Custom Bet
+    inline int iBetAmount = 1000;         // Value for Custom Bet
 
 
     // debug shit

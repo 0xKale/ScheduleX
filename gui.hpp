@@ -29,6 +29,32 @@ namespace gui
 		ImGui::Checkbox("God Mode", &vars::bCanTakeDamage);
     }
 
+    inline void RenderPoliceTab()
+    {
+        // Future Police Tab Features
+	}
+
+    inline void RenderCasinoTab()
+    {
+        ImGui::Spacing();
+        ImGui::TextDisabled("SLOT MACHINES");
+        ImGui::Separator();
+        ImGui::Checkbox("Always Jackpot", &vars::bAlwaysJackpot);
+        ImGui::Spacing();
+        ImGui::Checkbox("Custom Bet Amount", &vars::bCustomBet);
+        if (vars::bCustomBet)
+        {
+            ImGui::Indent();
+            ImGui::InputInt("Amount", &vars::iBetAmount, 100, 1000000);
+            if (vars::iBetAmount < 0) vars::iBetAmount = 0;
+            ImGui::Unindent();
+        }
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Current Status:");
+        ImGui::Text("Next Spin: %s", vars::bAlwaysJackpot ? "JACKPOT" : "Random");
+        ImGui::Text("Bet Value: %d", vars::bCustomBet ? vars::iBetAmount : -1);
+    }
+
     inline void RenderEspTab()
     {
         ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
@@ -80,17 +106,16 @@ namespace gui
 
     inline void Render()
     {
-		if (GetAsyncKeyState(VK_HOME) & 1 || GetAsyncKeyState(VK_INSERT) & 1) // insert and home key to toggle menu
+        if (GetAsyncKeyState(VK_HOME) & 1 || GetAsyncKeyState(VK_INSERT) & 1)
         {
             vars::bShowMenu = !vars::bShowMenu;
-            if (vars::bShowMenu) {
-                hooks::ForceUnlock();
-            }
-            else {
+            if (!vars::bShowMenu) {
                 hooks::CursorHandler();
             }
         }
-
+        if (vars::bShowMenu) {
+            hooks::ForceUnlock();
+        }
         ImGui::GetIO().MouseDrawCursor = vars::bShowMenu;
 
         if (!vars::bShowMenu) return;
@@ -114,6 +139,17 @@ namespace gui
                     ImGui::EndTabItem();
 				}
 
+                if (ImGui::BeginTabItem("Police"))
+                {
+                    RenderPoliceTab();
+                    ImGui::EndTabItem();
+				}
+
+                if (ImGui::BeginTabItem("Casino"))
+                {
+                    RenderCasinoTab();
+                    ImGui::EndTabItem();
+                }
                 if (ImGui::BeginTabItem("ESP"))
                 {
                     RenderEspTab();
