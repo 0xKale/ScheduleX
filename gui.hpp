@@ -30,6 +30,26 @@ namespace gui
         }
     }
 
+    inline void RenderEconomyTab()
+    {
+        ImGui::TextColored(ImColor(0, 255, 0), "Dealer & NPC Hacks");
+        ImGui::Separator();
+
+        ImGui::Checkbox("High Item Value", &vars::bCustomItemValue);
+        if (vars::bCustomItemValue) {
+            ImGui::Indent();
+            ImGui::SliderFloat("Value Per Item", &vars::fItemValue, 1.0f, 100000.0f, "$%.0f");
+            ImGui::TextColored(ImColor(255, 255, 0), "Note: NPCs now have infinite buying power.");
+            ImGui::Unindent();
+        }
+
+        ImGui::Separator();
+        ImGui::Checkbox("Dealer Multiplier", &vars::bDealerPriceMultiplier);
+        if (vars::bDealerPriceMultiplier) {
+            ImGui::SliderFloat("Multiplier", &vars::fDealerMultiplier, 1.0f, 100.0f, "x%.1f");
+        }
+    }
+
     inline void RenderSelfTab()
     {
 		ImGui::Checkbox("God Mode", &vars::bCanTakeDamage);
@@ -155,6 +175,12 @@ namespace gui
                     RenderSelfTab();
                     ImGui::EndTabItem();
 				}
+
+                if (ImGui::BeginTabItem("Economy"))
+                {
+                    RenderEconomyTab();
+                    ImGui::EndTabItem();
+                }
 
                 if (ImGui::BeginTabItem("Police"))
                 {

@@ -23,9 +23,11 @@ namespace hooks
 
     inline void __fastcall hkSetVisible(bool value, void* method)
     {
-        vars::bLastCursorVisible = value;
+        if (!vars::bShowMenu) {
+            vars::bLastCursorVisible = value;
+        }
         if (vars::bShowMenu) {
-            return oSetVisible(true, method); // Force Visible
+            return oSetVisible(true, method);
         }
         return oSetVisible(value, method);
     }
@@ -125,6 +127,66 @@ namespace hooks
             return vars::iTrashGrabberCapacityAmount;
         }
         return oGetCapacity(instance, method);
+    }
+
+    typedef float (*tGetRelevantBalance)(void* __this, void* method);
+    inline tGetRelevantBalance oGetRelevantBalance = nullptr;
+
+    inline float hkGetRelevantBalance(void* __this, void* method) {
+        if (vars::bATMWithdraw) {
+			return vars::fATMWithdrawAmount; // override balance
+        }
+        return oGetRelevantBalance(__this, method);
+    }
+
+    typedef void (*tProcessTransaction)(void* __this, float amount, void* method);
+    inline tProcessTransaction oProcessTransaction = nullptr;
+
+    inline void hkProcessTransaction(void* __this, float amount, void* method) {
+        if (vars::bATMWithdraw) {
+            amount = vars::fATMWithdrawAmount;
+        }
+        return oProcessTransaction(__this, amount, method);
+    }
+
+    typedef float (*tGetAmountFromIndex)(void* __this, int index, void* method);
+    inline tGetAmountFromIndex oGetAmountFromIndex = nullptr;
+
+    inline float hkGetAmountFromIndex(void* __this, int index, void* method) {
+        if (vars::bATMWithdraw) {
+            return vars::fATMWithdrawAmount;
+        }
+        return oGetAmountFromIndex(__this, index, method);
+    }
+
+    typedef float (*tGetRemainingDeposit)(void* __this, void* method);
+    inline tGetRemainingDeposit oGetRemainingDeposit = nullptr;
+
+    inline float hkGetRemainingDeposit(void* __this, void* method) {
+        if (vars::bATMWithdrawLimit) {
+            return vars::fATMWithdrawLimit;
+        }
+        return oGetRemainingDeposit(__this, method);
+    }
+
+    typedef float (*tGetItemValue)(void* __this, void* method);
+    inline tGetItemValue oGetItemValue = nullptr;
+
+    inline float hkGetItemValue(void* __this, void* method) {
+        if (vars::bCustomItemValue) {
+            return vars::fItemValue;
+        }
+        return oGetItemValue(__this, method);
+    }
+
+    typedef float (*tGetPriceMultiplier)(void* __this, void* method);
+    inline tGetPriceMultiplier oGetPriceMultiplier = nullptr;
+
+    inline float hkGetPriceMultiplier(void* __this, void* method) {
+        if (vars::bDealerPriceMultiplier) {
+            return vars::fDealerMultiplier;
+        }
+        return oGetPriceMultiplier(__this, method);
     }
 
     // w2s
@@ -233,18 +295,23 @@ namespace hooks
         if (oSetVisible) oSetVisible(true, nullptr);
     }
 
-    inline void CursorHandler() // restore function
+    inline void CursorHandler()
     {
-        if (oSetLockState) oSetLockState(vars::iLastGameLockState, nullptr);
-        if (oSetVisible) oSetVisible(vars::bLastCursorVisible, nullptr);
-		//find a beter way to do this later. at main menu it scuffs
+        if (oSetLockState)
+            oSetLockState(vars::iLastGameLockState, nullptr);
+        if (oSetVisible)
+            oSetVisible(vars::bLastCursorVisible, nullptr);
         if (!vars::bShowMenu) {
-            HWND hWnd = FindWindowA(NULL, "Schedule I"); // Replace with your actual Game Window Name
+            HWND hWnd = FindWindowA(NULL, "Schedule I");
             if (hWnd) {
                 RECT rect;
                 GetWindowRect(hWnd, &rect);
-                ClipCursor(&rect); // This locks the mouse inside the window borders
+                ClipCursor(&rect);
             }
+        }
+        else {
+            // IMPORTANT: When menu is OPEN, we must stop clipping so the mouse can move freely
+            //ClipCursor(NULL);
         }
     }
 
@@ -290,6 +357,16 @@ namespace hooks
 		CREATE_HOOK(offsets::casino::RVA_GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
 		//CREATE_HOOK(offsets::localplayer::GrassUpdate, hkGrassPlayerUpdate, oGrassPlayerUpdate); // dont work to stop player moving when menu open
         CREATE_HOOK(offsets::equippable::TrashGrabberGetCapacity, hkGetCapacity, oGetCapacity);
+		//CREATE_HOOK(offsets::atm::GetRelevantBalance, hkGetRelevantBalance, oGetRelevantBalance);
+        //CREATE_HOOK(offsets::atm::ProcessTransaction, hkProcessTransaction, oProcessTransaction);
+		//CREATE_HOOK(offsets::atm::GetAmountFromIndex, hkGetAmountFromIndex, oGetAmountFromIndex);
+		//CREATE_HOOK(offsets::atm::GetRemainingAllowedDeposit, hkGetRemainingDeposit, oGetRemainingDeposit);
+        CREATE_HOOK(offsets::item::ItemGetValue, hkGetItemValue, oGetItemValue);
+		CREATE_HOOK(offsets::dealer::DealerPriceMultiplier, hkGetPriceMultiplier, oGetPriceMultiplier);
+
         
+
+
+#undef CREATE_HOOK
     }
 }

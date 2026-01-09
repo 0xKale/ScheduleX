@@ -40,13 +40,27 @@ namespace offsets
     namespace player
     {
 		inline uintptr_t PlayerUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update
-
-
-		
         inline uintptr_t StaticPlayerList = 0x20;// Player List offset
 	}
+    namespace atm
+    {
+		inline uintptr_t GetRelevantBalance = 0x973AE0; // ATM Get Relevant Balance - ScheduleOne_UI_ATM_ATMInterface$$get_relevantBalance
+        inline uintptr_t WithdrawButtonPressed = 0x973820; // ATM Withdraw Button Pressed - ScheduleOne_UI_ATM_ATMInterface$$WithdrawButtonPressed
+		inline uintptr_t ProcessTransaction = 0x972330; // ATM Process Transaction - ScheduleOne_UI_ATM_ATMInterface$$ProcessTransaction
+		inline uintptr_t GetAmountFromIndex = 0x971E90; // ATM Get Amount From Index - ScheduleOne_UI_ATM_ATMInterface$$GetAmountFromIndex
+		inline uintptr_t GetRemainingAllowedDeposit = 0x973BC0; // ATM Get Remaining Allowed Deposit - ScheduleOne_UI_ATM_ATMInterface$$get_remainingAllowedDeposit
+    } 
+    namespace dealer
+    {
+		inline uintptr_t DealerPriceMultiplier = 0x6D40A0; // Dealer Price Multiplier - ScheduleOne.Economy.Dealer$$GetPriceMultiplier
+    }
+    namespace item
+    {
+		inline uintptr_t ItemGetValue = 0x70E5C0;// Item Get Value - ScheduleOne.Items.Item$$get_Value
+    }
     namespace npc
     {
 		inline uintptr_t MovementUpdate = 0x7254D0; // NPC Movement Update - NPC.NPCModel$$MovementUpdate
+		inline uintptr_t AddCash = 0x704AC0; // NPC Add Cash - NPC.NPCModel$$AddCash
     }
 }

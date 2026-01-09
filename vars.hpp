@@ -54,6 +54,20 @@ namespace vars
 	inline int iTrashGrabberCapacityAmount = 9999; // trash grabber capacity
 	inline bool bBetterTrashGrabber = false; // toggle for trash grabber capacity
 
+	// ATM Options
+	inline bool bATMWithdraw = false; // atm withdraw
+	inline float fATMWithdrawAmount = 99999.0f; // atm withdraw amount
+	inline bool bATMWithdrawLimit = false; // atm withdraw limit toggle
+	inline float fATMWithdrawLimit = 10000.0f; // atm daily limit
+
+    // item
+	inline bool bCustomItemValue = false; // toggle for custom item value
+	inline float fItemValue = 1000.0f; // custom item value 
+
+    // dealer
+	inline bool bDealerPriceMultiplier = false; // toggle for dealer price multiplier
+	inline float fDealerMultiplier = 100.0f; // dealer price multiplier
+
 
     // debug shit
     inline bool bDebug = false;
