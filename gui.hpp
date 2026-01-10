@@ -75,6 +75,9 @@ namespace gui
         }
     }
 
+
+
+
     inline void RenderEconomyTab()
     {
         ImGui::TextColored(ImColor(0, 255, 0), "Dealer & NPC Hacks");
