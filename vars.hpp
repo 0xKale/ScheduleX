@@ -160,17 +160,6 @@ namespace vars
     inline bool bDisarmPolice = false;
     inline bool bPacifistPolice = false;
     inline bool bAntiJail = false;
-
-    // menu settings
-    inline float fMenuOpacity = 1.0f;
-    inline float fMenuRounding = 4.0f;
-    inline bool bMenuAnimations = true;
-    inline float fMenuScale = 1.0f;
-    inline int iMenuColorTheme = 0; // 0 = Dark, 1 = Light, 2 = Classic, 3 = Custom
-    inline float cMenuAccent[4] = { 0.26f, 0.59f, 0.98f, 1.0f }; // Default ImGui blue
-    inline bool bSaveOnClose = false;
-    inline bool bShowTooltips = true;
-    inline bool bConfirmOnReset = true;
 }
 
 namespace defaults
@@ -209,14 +198,4 @@ namespace defaults
     // Hover (Mod Defaults)
     constexpr bool  hoverMode = false;
     constexpr float hoverHeight = 0.2f;
-
-    // Menu Defaults
-    constexpr float menuOpacity = 1.0f;
-    constexpr float menuRounding = 4.0f;
-    constexpr bool  menuAnimations = true;
-    constexpr float menuScale = 1.0f;
-    constexpr int   menuColorTheme = 0;
-    constexpr bool  saveOnClose = false;
-    constexpr bool  showTooltips = true;
-    constexpr bool  confirmOnReset = true;
 }
