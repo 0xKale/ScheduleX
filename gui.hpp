@@ -48,6 +48,21 @@ namespace gui
         ResetHover();
     }
 
+    void ResetMenuSettings() {
+        vars::fMenuOpacity = defaults::menuOpacity;
+        vars::fMenuRounding = defaults::menuRounding;
+        vars::bMenuAnimations = defaults::menuAnimations;
+        vars::fMenuScale = defaults::menuScale;
+        vars::iMenuColorTheme = defaults::menuColorTheme;
+        vars::cMenuAccent[0] = 0.26f;
+        vars::cMenuAccent[1] = 0.59f;
+        vars::cMenuAccent[2] = 0.98f;
+        vars::cMenuAccent[3] = 1.0f;
+        vars::bSaveOnClose = defaults::saveOnClose;
+        vars::bShowTooltips = defaults::showTooltips;
+        vars::bConfirmOnReset = defaults::confirmOnReset;
+    }
+
     inline void RenderQoLTab()
     {
         ImGui::Checkbox("Debug", &vars::bDebug);
@@ -342,6 +357,83 @@ namespace gui
         }
     }
 
+    inline void RenderSettingsTab()
+    {
+        ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), "MENU APPEARANCE");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        if (ImGui::Button("Reset All Settings", ImVec2(-1, 0))) {
+            if (vars::bConfirmOnReset) {
+                ImGui::OpenPopup("Confirm Reset");
+            } else {
+                ResetMenuSettings();
+            }
+        }
+
+        if (ImGui::BeginPopupModal("Confirm Reset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Are you sure you want to reset all menu settings?");
+            ImGui::Separator();
+            if (ImGui::Button("Yes", ImVec2(120, 0))) {
+                ResetMenuSettings();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("No", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        ImGui::Spacing();
+        ImGui::SliderFloat("Menu Opacity", &vars::fMenuOpacity, 0.3f, 1.0f, "%.2f");
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Adjust the transparency of the menu.");
+
+        ImGui::SliderFloat("Corner Rounding", &vars::fMenuRounding, 0.0f, 12.0f, "%.1f");
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Adjust the roundness of menu corners.");
+
+        ImGui::SliderFloat("Menu Scale", &vars::fMenuScale, 0.8f, 1.5f, "%.2f x");
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Scale the entire menu UI.");
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "COLOR THEME");
+        ImGui::Spacing();
+
+        const char* themes[] = { "Dark", "Light", "Classic", "Custom" };
+        ImGui::Combo("Theme", &vars::iMenuColorTheme, themes, IM_ARRAYSIZE(themes));
+
+        if (vars::iMenuColorTheme == 3) {
+            ImGui::Indent();
+            ImGui::ColorEdit4("Accent Color", vars::cMenuAccent, ImGuiColorEditFlags_NoInputs);
+            if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Pick a custom accent color for the menu.");
+            ImGui::Unindent();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.3f, 1.0f, 0.5f, 1.0f), "BEHAVIOR");
+        ImGui::Spacing();
+
+        ImGui::Checkbox("Enable Animations", &vars::bMenuAnimations);
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Enable smooth menu animations.");
+
+        ImGui::Checkbox("Show Tooltips", &vars::bShowTooltips);
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Show helpful tooltips on hover.");
+
+        ImGui::Checkbox("Confirm Before Reset", &vars::bConfirmOnReset);
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Show confirmation dialog before resetting settings.");
+
+        ImGui::Checkbox("Save Settings on Close", &vars::bSaveOnClose);
+        if (ImGui::IsItemHovered() && vars::bShowTooltips) ImGui::SetTooltip("Automatically save settings when closing the menu.");
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "KEYBINDS");
+        ImGui::Spacing();
+        ImGui::TextDisabled("Toggle Menu: HOME / INSERT");
+    }
+
     inline void RenderOtherTab()
     {
         ImGui::Checkbox("Show Watermark", &vars::bWatermark);
@@ -421,6 +513,12 @@ namespace gui
                 if (ImGui::BeginTabItem("Other"))
                 {
                     RenderOtherTab();
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("Settings"))
+                {
+                    RenderSettingsTab();
                     ImGui::EndTabItem();
                 }
 
