@@ -39,8 +39,16 @@ namespace offsets
     }
     namespace player
     {
-        inline uintptr_t PlayerModelUpdate = 0x63FE10; // Player Update - Player.PlayerModel$$Update
-        inline uintptr_t StaticPlayerList = 0x20;// Player List offset
+
+
+        inline uintptr_t PlayerUpdate = 0x642620; // scheduleone.playerscripts.player$$update
+
+        //offsets
+        inline uintptr_t StaticPlayerList = 0x0; // public static list<player> players;
+        inline uintptr_t ListItems = 0x10; // internal array buffer
+        inline uintptr_t ListSize = 0x18; // current count
+        inline uintptr_t ArrayStart = 0x20; // start of elements in array
+        inline uintptr_t PointerStep = 0x8; // size of x64 pointer
 
         inline uintptr_t PlayerMovementUpdate = 0x66A720;
         inline uintptr_t TakeDamage = 0x6F8CA0;
@@ -135,4 +143,8 @@ namespace offsets
     {
         inline uintptr_t SetCheckpointEnabled = 0x60CBB0; // ScheduleOne_Law_CheckpointManager$$SetCheckpointEnabled
     }
+    namespace ItemFramework
+    {
+        inline uintptr_t SetBalance = 0x994440; // ScheduleOne_ItemFramework_CashInstance$$SetBalance
+	}
 }

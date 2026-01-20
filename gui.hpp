@@ -96,6 +96,13 @@ namespace gui
         if (vars::bDealerPriceMultiplier) {
             ImGui::SliderFloat("Multiplier", &vars::fDealerMultiplier, 1.0f, 100.0f, "x%.1f");
         }
+
+		ImGui::Checkbox("SetBalance Test", &vars::bCustomBalance);
+        if (vars::bCustomBalance) {
+            ImGui::Indent();
+            ImGui::SliderFloat("Balance Amount", &vars::fBalanceAmount, 0.0f, 100000000.0f, "$%.0f");
+            ImGui::Unindent();
+        }
     }
 
     inline void RenderSelfTab()
@@ -290,32 +297,71 @@ namespace gui
 
     inline void RenderEspTab()
     {
-        ImGui::Checkbox("Enable ESP", &vars::bEspEnabled);
-        if (vars::bEspEnabled)
-        {
-            ImGui::Spacing();
-            ImGui::Checkbox("Show NPCs", &vars::bNpcEsp);
-            if (vars::bNpcEsp)
-            {
-                ImGui::Indent(); 
-                ImGui::Checkbox("Draw Boxes 2D", &vars::bDrawNpcBox2D);
-                if (vars::bDrawNpcBox2D) {
-                    ImGui::SameLine();
-                    ImGui::ColorEdit4("##NpcBoxColor", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-                }
-                ImGui::Checkbox("Draw Boxes 3D (Scuffed)", &vars::bDrawNpcBox3D);
-                if (vars::bDrawNpcBox3D) {
-                    ImGui::SameLine();
-                    ImGui::ColorEdit4("##NpcBoxColor", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-                }
-                ImGui::Checkbox("Draw Name", &vars::bDrawNpcName);
-                if (vars::bDrawNpcName) {
-                    ImGui::SameLine();
-                    ImGui::ColorEdit4("##NpcNameColor", vars::cNpcName, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-                }
+        ImGui::Checkbox("enable esp", &vars::bEspEnabled); // master toggle
+        if (!vars::bEspEnabled) return;
 
-                ImGui::Unindent();
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // players
+        ImGui::Checkbox("show players", &vars::bPlayerEsp);
+        if (vars::bPlayerEsp)
+        {
+            ImGui::Indent();
+
+            ImGui::Checkbox("draw player 2d", &vars::bDrawPlayerBox2D);
+            if (vars::bDrawPlayerBox2D) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##pbox2d", vars::cPlayerBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
             }
+
+            ImGui::Checkbox("draw player 3d", &vars::bDrawPlayerBox3D);
+            if (vars::bDrawPlayerBox3D) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##pbox3d", vars::cPlayerBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            }
+
+            ImGui::Checkbox("draw player name", &vars::bDrawPlayerName);
+            if (vars::bDrawPlayerName) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##pname", vars::cPlayerName, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            }
+
+            ImGui::Unindent();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // npcs
+        ImGui::Checkbox("show npcs", &vars::bNpcEsp);
+        if (vars::bNpcEsp)
+        {
+            ImGui::Indent();
+
+            ImGui::Checkbox("draw npc 2d", &vars::bDrawNpcBox2D);
+            if (vars::bDrawNpcBox2D) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##nbox2d", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            }
+
+            ImGui::Checkbox("draw npc 3d", &vars::bDrawNpcBox3D);
+            if (vars::bDrawNpcBox3D) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##nbox3d", vars::cNpcBox, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            }
+
+            ImGui::Checkbox("draw npc name", &vars::bDrawNpcName);
+            if (vars::bDrawNpcName) {
+                ImGui::SameLine();
+                ImGui::ColorEdit4("##nname", vars::cNpcName, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            }
+
+            ImGui::Checkbox("draw npc name ui list", &vars::bDrawNPCList);
+
+            ImGui::Unindent();
         }
     }
 

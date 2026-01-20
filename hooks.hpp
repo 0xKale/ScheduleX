@@ -66,6 +66,19 @@ namespace hooks
         return oSetfieldOfView(CameraMain, vars::bCustomFieldOfView ? vars::fFieldOfView : fov);
     }
 
+    //SetBalance
+    typedef void(__fastcall* tSetBalance)(float balance);
+    inline tSetBalance oSetBalance = nullptr;
+
+    inline void __fastcall hkSetBalance(float balance)
+    {
+        if (vars::bCustomBalance)
+        {
+            return oSetBalance(vars::fBalanceAmount);
+        }
+		return oSetBalance(balance);
+    }
+
     // stack limit
     typedef int(__fastcall* tGetStackLimit)(void* __this);
     inline tGetStackLimit oGetStackLimit = nullptr;
@@ -269,24 +282,23 @@ namespace hooks
     typedef Quaternion(__fastcall* tGetRotation)(void* transform);
     inline tGetRotation oGetRotation = nullptr;
 
-    // player update ESP
-    typedef void(__fastcall* tPlayerModelUpdate)(void* __this, void* method);
-    inline tPlayerModelUpdate oPlayerModelUpdate = nullptr;
 
-    inline void __fastcall hkPlayerModelUpdate(void* __this, void* method) {
-        if (__this)
-        {
-            void* Class = *(void**)__this;
-            if (Class)
-            {
-                // 0xB8 is standard for x64 Static Fields
-                void* staticFields = *(void**)((uintptr_t)Class + 0xB8);
-                if (staticFields) {
-                    vars::pPlayerList = *(void**)((uintptr_t)staticFields + offsets::player::StaticPlayerList);
+    //player esp
+    typedef void(__fastcall* tPlayerUpdate)(void* __this, void* method);
+    inline tPlayerUpdate oPlayerUpdate = nullptr;
+
+    inline void __fastcall hkPlayerUpdate(void* __this, void* method) {
+        if (__this) {
+            void* klass = *(void**)__this;
+            if (klass) {
+                // standard x64 static fields offset
+                void* static_fields = *(void**)((uintptr_t)klass + 0xB8);
+                if (static_fields) {
+                    vars::pPlayerList = *(void**)((uintptr_t)static_fields + offsets::player::StaticPlayerList);
                 }
             }
         }
-        return oPlayerModelUpdate(__this, method);
+        return oPlayerUpdate(__this, method);
     }
 
 
@@ -519,7 +531,7 @@ namespace hooks
         CREATE_HOOK(offsets::debug::DebugValue, hkDebugValue, oDebugValue);
         CREATE_HOOK(offsets::localplayer::SetfieldOfView, hkSetfieldOfView, oSetfieldOfView);
         CREATE_HOOK(offsets::localplayer::GetStackLimit, hkGetStackLimit, oGetStackLimit);
-        CREATE_HOOK(offsets::player::PlayerModelUpdate, hkPlayerModelUpdate, oPlayerModelUpdate);
+        //CREATE_HOOK(offsets::player::PlayerModelUpdate, hkPlayerModelUpdate, oPlayerModelUpdate);
         CREATE_HOOK(offsets::npc::MovementUpdate, hkNpcUpdate, oNpcUpdate);
 		CREATE_HOOK(offsets::localplayer::CanTakeDamage, hk_get_CanTakeDamage, o_get_CanTakeDamage); 
 		CREATE_HOOK(offsets::localplayer::RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
@@ -545,6 +557,10 @@ namespace hooks
         CREATE_HOOK(offsets::police::UpdateLethalBehaviour, hkUpdateLethal, oUpdateLethal);
         CREATE_HOOK(offsets::police::UpdateNonLethalBehaviour, hkUpdateNonLethal, oUpdateNonLethal);
         CREATE_HOOK(offsets::police::UpdateArrestBehaviour, hkUpdateArrest, oUpdateArrest);
+		CREATE_HOOK(offsets::ItemFramework::SetBalance, hkSetBalance, oSetBalance);
+
+        //player ESP 
+        CREATE_HOOK(offsets::player::PlayerUpdate, hkPlayerUpdate, oPlayerUpdate);
 
 
         

@@ -162,38 +162,49 @@ namespace esp
         if (!vars::bEspEnabled || !vars::pMainCamera) return;//Global Master Switch & Safety Checks
         if (!hooks::oGetTransform || !hooks::oGetPosition) return;// Ensure we have the basic Unity functions needed
 
-        //player esp
-        if (vars::bPlayerEsp && vars::pPlayerList)
-        {
-            auto list = (UnityList<void*>*)vars::pPlayerList;
-            if (list->size > 0 && list->size < 1000)// Sanity check size
-            {
-                for (int i = 0; i < list->size; i++)
-                {
-                    void* player = GetItem<void*>(vars::pPlayerList, i);
+        // player esp
+        if (vars::bPlayerEsp && vars::pPlayerList) {
+            void* items = *(void**)((uintptr_t)vars::pPlayerList + offsets::player::ListItems); // internal array buffer
+            int size = *(int*)((uintptr_t)vars::pPlayerList + offsets::player::ListSize); // current count
+
+            if (items && size > 0 && size < 100) { // sanity check. if it exists or incorrect code
+                for (int i = 0; i < size; i++) {
+                    void* player = *(void**)((uintptr_t)items + offsets::player::ArrayStart + (i * offsets::player::PointerStep)); // get player pointer
                     if (!player) continue;
 
-                    void* transform = hooks::oGetTransform(player);
+                    void* transform = hooks::oGetTransform(player); // get transform
                     if (!transform) continue;
 
-                    Vector3 worldPos = hooks::oGetPosition(transform);
+                    Vector3 world_pos = hooks::oGetPosition(transform); // get world position
+                    ImVec2 foot_pos;
 
-                    ImVec2 footPos;
-                    if (hooks::GetScreenPos(worldPos, footPos))
-                    {
-                        Vector3 headWorld = worldPos;
-                        headWorld.y += 1.8f; // Player Height
+                    if (hooks::GetScreenPos(world_pos, foot_pos)) { // project to screen
+                        Vector3 head_world = world_pos;
+                        head_world.y += 1.8f; // player height offset
 
-                        ImVec2 headPos;
-                        if (hooks::GetScreenPos(headWorld, headPos))
-                        {
-                            float height = footPos.y - headPos.y;
+                        ImVec2 head_pos;
+                        if (hooks::GetScreenPos(head_world, head_pos)) {
+                            float height = foot_pos.y - head_pos.y; // calculate dimensions
                             float width = height / 2.0f;
-                            float x = footPos.x - (width / 2.0f);
-                            float y = headPos.y;
+                            float x = foot_pos.x - (width / 2.0f);
+                            float y = head_pos.y;
 
-                            if (vars::bDrawBox) {
+                            if (vars::bDrawPlayerBox2D) {
                                 DrawBox(x, y, width, height, ImColor(vars::cPlayerBox[0], vars::cPlayerBox[1], vars::cPlayerBox[2])); // draw player box
+                            }
+
+                            if (vars::bDrawPlayerBox3D) {
+                                Draw3DBox(world_pos, 0.4f, 1.8f, 0.4f, ImColor(vars::cPlayerBox[0], vars::cPlayerBox[1], vars::cPlayerBox[2])); // draw player 3d box
+                            }
+
+                            if (vars::bDrawPlayerName) {
+                                std::string name = GetNameFromUnity(player); // get player name
+                                ImVec2 text_size = ImGui::CalcTextSize(name.c_str());
+                                float text_x = x + (width / 2.0f) - (text_size.x / 2.0f);
+                                float text_y = y - text_size.y - 2.0f;
+
+                                ImGui::GetBackgroundDrawList()->AddText(ImVec2(text_x + 1, text_y + 1), ImColor(0, 0, 0), name.c_str()); // shadow
+                                ImGui::GetBackgroundDrawList()->AddText(ImVec2(text_x, text_y), ImColor(vars::cPlayerName[0], vars::cPlayerName[1], vars::cPlayerName[2]), name.c_str()); // draw player name
                             }
                         }
                     }
@@ -204,6 +215,15 @@ namespace esp
 		// npc esp
         if (vars::bNpcEsp && !vars::vNpcList.empty())
         {
+            //list shit
+            float listX = 15.0f;
+            float listY = 15.0f;
+            float verticalSpacing = 15.0f;
+
+
+            static std::vector<std::string> frameNpcNames;
+            frameNpcNames.clear();
+
             for (size_t i = 0; i < vars::vNpcList.size(); i++)
             {
                 void* npc = vars::vNpcList[i];
@@ -213,14 +233,12 @@ namespace esp
                 if (!transform) continue;
 
                 Vector3 worldPos = hooks::oGetPosition(transform);
-
-
-
                 ImVec2 footPos;
+
                 if (hooks::GetScreenPos(worldPos, footPos))
                 {
                     Vector3 headWorld = worldPos;
-                    headWorld.y += 1.8f; // NPC Height
+                    headWorld.y += 1.8f; // pnc height
 
                     ImVec2 headPos;
                     if (hooks::GetScreenPos(headWorld, headPos))
@@ -231,18 +249,29 @@ namespace esp
                         float y = headPos.y;
 
                         if (vars::bDrawNpcBox2D) {
-                            DrawBox(x, y, width, height, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2])); // draw npc box
+                            DrawBox(x, y, width, height, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2]));
                         }
                         if (vars::bDrawNpcBox3D) {
-                            Draw3DBox(worldPos, 0.4f, 1.8f, 0.4f, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2])); // draw npc box 3d
+                            Draw3DBox(worldPos, 0.4f, 1.8f, 0.4f, ImColor(vars::cNpcBox[0], vars::cNpcBox[1], vars::cNpcBox[2]));
                         }
+
+                        // get name for list and name esp
+                        std::string name = GetNameFromUnity(npc);
+
                         if (vars::bDrawNpcName)
                         {
-                            std::string name = GetNameFromUnity(npc);ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
+                            ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
                             float textX = x + (width / 2.0f) - (textSize.x / 2.0f);
-							float textY = y - textSize.y - 2.0f; // Slightly above the box
-                            ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX + 1, textY + 1), ImColor(0, 0, 0), name.c_str()); // shadow
-							ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX, textY), ImColor(vars::cNpcName[0], vars::cNpcName[1], vars::cNpcName[2]), name.c_str()); // draw npc name
+                            float textY = y - textSize.y - 2.0f;
+                            ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX + 1, textY + 1), ImColor(0, 0, 0), name.c_str());
+                            ImGui::GetBackgroundDrawList()->AddText(ImVec2(textX, textY), ImColor(vars::cNpcName[0], vars::cNpcName[1], vars::cNpcName[2]), name.c_str()); /* draw npc name*/
+                        }
+
+                        // draw name list.
+                        if (vars::bDrawNPCList) {
+                            ImGui::GetForegroundDrawList()->AddText(ImVec2(listX + 1, listY + 1), ImColor(0, 0, 0), name.c_str());
+                            ImGui::GetForegroundDrawList()->AddText(ImVec2(listX, listY), ImColor(255, 255, 255), name.c_str());
+                            listY += verticalSpacing;
                         }
                     }
                 }
