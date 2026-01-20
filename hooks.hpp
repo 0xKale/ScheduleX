@@ -64,16 +64,32 @@ namespace hooks
         return oSetfieldOfView(CameraMain, vars::bCustomFieldOfView ? vars::fFieldOfView : fov);
     }
 
-    typedef void(__fastcall* tSetBalance)(float balance);
+    typedef void(__fastcall* tSetBalance)(void* __this, float balance);
     inline tSetBalance oSetBalance = nullptr;
 
-    inline void __fastcall hkSetBalance(float balance)
-    {
-        if (vars::bCustomBalance)
-        {
-            return oSetBalance(vars::fBalanceAmount);
+    inline void __fastcall hkSetBalance(void* __this, float balance) {
+        if (__this) vars::pCashInstance = __this; // capture instance
+
+        if (vars::bCustomBalance) {
+            return oSetBalance(__this, vars::fTargetCash); //custom value
         }
-        return oSetBalance(balance);
+        return oSetBalance(__this, balance);
+    }
+
+    // bank hook
+    typedef void(__fastcall* tSetBankBalance)(void* __this, float balance);
+    inline tSetBankBalance oSetBankBalance = nullptr;
+
+    inline void __fastcall hkSetBankBalance(void* __this, float balance) {
+        if (__this) {
+            vars::pBankInstance = __this; // capture object
+        }
+
+        if (vars::bCustomBalance) {
+            return oSetBankBalance(__this, vars::fTargetBank);
+        }
+
+        return oSetBankBalance(__this, balance);
     }
 
     typedef int(__fastcall* tGetStackLimit)(void* __this);
@@ -448,9 +464,6 @@ namespace hooks
         CREATE_HOOK(offsets::localplayer::RpcTakeDamage, hk_RpcTakeDamage, o_RpcTakeDamage);
         CREATE_HOOK(offsets::ItemFramework::SetBalance, hkSetBalance, oSetBalance);
 
-        // casino
-        CREATE_HOOK(offsets::casino::GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
-        CREATE_HOOK(offsets::casino::GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
 
         // equippable
         CREATE_HOOK(offsets::equippable::TrashGrabberGetCapacity, hkGetCapacity, oGetCapacity);
@@ -479,6 +492,12 @@ namespace hooks
 
         // player esp
         CREATE_HOOK(offsets::player::PlayerUpdate, hkPlayerUpdate, oPlayerUpdate);
+
+		// economy 
+        CREATE_HOOK(offsets::casino::GetRandomSymbol, hk_GetRandomSymbol, o_GetRandomSymbol);
+        CREATE_HOOK(offsets::casino::GetCurrentBet, hk_GetCurrentBetAmount, o_GetCurrentBetAmount);
+        CREATE_HOOK(offsets::ItemFramework::SetBalance, hkSetBalance, oSetBalance);
+        CREATE_HOOK(offsets::ItemFramework::SetBankBalance, hkSetBankBalance, oSetBankBalance);
 
 #undef CREATE_HOOK
     }

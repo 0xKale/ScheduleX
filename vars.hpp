@@ -56,11 +56,6 @@ namespace vars
     inline float fGravityScale = 1.0f;  // 1.0 = normal, 0.5 = low gravity
     inline bool bInfiniteJump = false;
 
-    // casino options
-    inline bool bAlwaysJackpot = false;   // toggle for jackpot
-    inline bool bCustomBet = false;       // toggle for custom bet
-    inline int iBetAmount = 1000;         // value for custom bet
-
     // equipable
     inline int iTrashGrabberCapacityAmount = 9999; // trash grabber capacity
     inline bool bBetterTrashGrabber = false; // toggle for trash grabber capacity
@@ -158,9 +153,19 @@ namespace vars
     inline bool bPacifistPolice = false;
     inline bool bAntiJail = false;
 
-    // bal
-    inline float fBalanceAmount = 99999999.0f;
-    inline bool bCustomBalance = false; // custom balance
+    // economy
+    inline bool bCustomBalance = false; // balance mod toggle
+    inline float fTargetCash = 100000.0f; // target cash amount
+    inline float fTargetBank = 500000.0f; // target bank amount
+
+    // pointers
+    inline void* pCashInstance = nullptr; // captured cash object
+    inline void* pBankInstance = nullptr; // captured bank object
+
+    // casino
+    inline bool bAlwaysJackpot = false; // jackpot toggle
+    inline bool bCustomBet = false; // bet toggle
+    inline int iBetAmount = 1000; // bet value
 }
 
 namespace defaults

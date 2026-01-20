@@ -80,29 +80,72 @@ namespace gui
 
     inline void RenderEconomyTab()
     {
-        ImGui::TextColored(ImColor(0, 255, 0), "Dealer & NPC Hacks");
+        ImGui::Checkbox("enable custom balance", &vars::bCustomBalance);
+        ImGui::SameLine();
+        ImGui::TextDisabled("(?) spend/earn once to capture");
+
+        if (vars::bCustomBalance)
+        {
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            // cash
+            ImGui::Text("cash management");
+            ImGui::InputFloat("target cash", &vars::fTargetCash, 100.0f, 1000.0f, "%.2f");
+            if (ImGui::Button("set cash balance")) {
+                if (vars::pCashInstance && hooks::oSetBalance) {
+                    hooks::oSetBalance(vars::pCashInstance, vars::fTargetCash);
+                }
+            }
+
+            ImGui::Spacing();
+
+            // bank
+            // fix ts shit.
+            ImGui::Text("bank management");
+            ImGui::InputFloat("target bank", &vars::fTargetBank, 100.0f, 1000.0f, "%.2f");
+
+            if (ImGui::Button("set bank balance")) {
+                // CRITICAL SAFETY CHECK: ensures pointers are valid before calling
+                if (vars::pBankInstance != nullptr && hooks::oSetBankBalance != nullptr) {
+                    hooks::oSetBankBalance(vars::pBankInstance, vars::fTargetBank);
+                }
+            }
+
+            // visual indicator to tell you if it's ready
+            if (vars::pBankInstance == nullptr) {
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "[!] interacting with atm required");
+            }
+            else {
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(0, 1, 0, 1), "[ready]");
+            }
+        }
+
+        // casino section
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::TextDisabled("slot machines");
         ImGui::Separator();
 
-        ImGui::Checkbox("High Item Value", &vars::bCustomItemValue);
-        if (vars::bCustomItemValue) {
+        ImGui::Checkbox("always jackpot", &vars::bAlwaysJackpot);
+        ImGui::Spacing();
+        ImGui::Checkbox("custom bet amount", &vars::bCustomBet);
+
+        if (vars::bCustomBet)
+        {
             ImGui::Indent();
-            ImGui::SliderFloat("Value Per Item", &vars::fItemValue, 1.0f, 100000.0f, "$%.0f");
-            ImGui::TextColored(ImColor(255, 255, 0), "Note: NPCs now have infinite buying power.");
+            ImGui::InputInt("amount", &vars::iBetAmount, 100, 1000000);
+            if (vars::iBetAmount < 0) vars::iBetAmount = 0;
             ImGui::Unindent();
         }
 
         ImGui::Separator();
-        ImGui::Checkbox("Dealer Multiplier", &vars::bDealerPriceMultiplier);
-        if (vars::bDealerPriceMultiplier) {
-            ImGui::SliderFloat("Multiplier", &vars::fDealerMultiplier, 1.0f, 100.0f, "x%.1f");
-        }
-
-		ImGui::Checkbox("SetBalance Test", &vars::bCustomBalance);
-        if (vars::bCustomBalance) {
-            ImGui::Indent();
-            ImGui::SliderFloat("Balance Amount", &vars::fBalanceAmount, 0.0f, 100000000.0f, "$%.0f");
-            ImGui::Unindent();
-        }
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "current status:");
+        ImGui::Text("next spin: %s", vars::bAlwaysJackpot ? "jackpot" : "random");
+        ImGui::Text("bet value: %d", vars::bCustomBet ? vars::iBetAmount : -1);
     }
 
     inline void RenderSelfTab()
@@ -274,26 +317,6 @@ namespace gui
         }
 	}
 
-    inline void RenderCasinoTab()
-    {
-        ImGui::Spacing();
-        ImGui::TextDisabled("SLOT MACHINES");
-        ImGui::Separator();
-        ImGui::Checkbox("Always Jackpot", &vars::bAlwaysJackpot);
-        ImGui::Spacing();
-        ImGui::Checkbox("Custom Bet Amount", &vars::bCustomBet);
-        if (vars::bCustomBet)
-        {
-            ImGui::Indent();
-            ImGui::InputInt("Amount", &vars::iBetAmount, 100, 1000000);
-            if (vars::iBetAmount < 0) vars::iBetAmount = 0;
-            ImGui::Unindent();
-        }
-        ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Current Status:");
-        ImGui::Text("Next Spin: %s", vars::bAlwaysJackpot ? "JACKPOT" : "Random");
-        ImGui::Text("Bet Value: %d", vars::bCustomBet ? vars::iBetAmount : -1);
-    }
 
     inline void RenderEspTab()
     {
@@ -447,11 +470,6 @@ namespace gui
                     ImGui::EndTabItem();
                 }
 
-                if (ImGui::BeginTabItem("Casino"))
-                {
-                    RenderCasinoTab();
-                    ImGui::EndTabItem();
-                }
                 if (ImGui::BeginTabItem("ESP"))
                 {
                     RenderEspTab();
