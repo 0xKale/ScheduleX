@@ -142,22 +142,43 @@ namespace esp
             time(&rawtime);
             localtime_s(&timeinfo, &rawtime);
             strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", &timeinfo);
-            std::string redText = "[DEV BUILD]";
-            char whiteBuffer[128];
-            sprintf_s(whiteBuffer, sizeof(whiteBuffer), " | %d FPS | %s | ScheduleX | By Dismay & Kingsley", (int)ImGui::GetIO().Framerate, timeBuffer);
-            std::string whiteText = whiteBuffer;
-            ImVec2 redSize = ImGui::CalcTextSize(redText.c_str());
-            ImVec2 whiteSize = ImGui::CalcTextSize(whiteText.c_str());
 
-            float totalWidth = redSize.x + whiteSize.x;
+            // split text for individual coloring
+            std::string redText = "[DEV BUILD]";
+            char middleBuffer[128];
+            sprintf_s(middleBuffer, sizeof(middleBuffer), " | %d FPS | %s | ScheduleX | By ", (int)ImGui::GetIO().Framerate, timeBuffer);
+            std::string rainbowText = "Dismay & Kingsley ";
+
+            // calculate sizes for accurate positioning
+            ImVec2 redSize = ImGui::CalcTextSize(redText.c_str());
+            ImVec2 midSize = ImGui::CalcTextSize(middleBuffer);
+            ImVec2 rainbowSize = ImGui::CalcTextSize(rainbowText.c_str());
+
+            float totalWidth = redSize.x + midSize.x + rainbowSize.x;
             float padding = 5.0f;
-			float x = ImGui::GetIO().DisplaySize.x - totalWidth - 15.0f; // 15 px from right edge
-            float y = 15.0f; // Keep top margin the same
-            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(x - padding, y - padding),ImVec2(x + totalWidth + padding, y + redSize.y + padding),ImColor(0, 0, 0, 200),4.0f);// 4. Draw Black Background Bar
-            ImGui::GetBackgroundDrawList()->AddText(ImVec2(x + 1, y + 1), ImColor(0, 0, 0), redText.c_str());
-            ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(255, 0, 0), redText.c_str());
-            ImGui::GetBackgroundDrawList()->AddText(ImVec2(x + redSize.x + 1, y + 1), ImColor(0, 0, 0), whiteText.c_str());
-            ImGui::GetBackgroundDrawList()->AddText(ImVec2(x + redSize.x, y), ImColor(255, 255, 255), whiteText.c_str());
+            float x = ImGui::GetIO().DisplaySize.x - totalWidth - 15.0f; // 15 px from right edge
+            float y = 15.0f;
+
+            // rainbow effect logic
+            float t = (float)ImGui::GetTime();
+            ImColor rainbowColor = ImColor::HSV(t * 0.5f, 1.0f, 1.0f);
+
+            auto drawList = ImGui::GetBackgroundDrawList();
+
+            // draw background bar
+            drawList->AddRectFilled(ImVec2(x - padding, y - padding), ImVec2(x + totalWidth + padding, y + redSize.y + padding), ImColor(0, 0, 0, 200), 4.0f);
+
+            // 1. draw red tag
+            drawList->AddText(ImVec2(x + 1, y + 1), ImColor(0, 0, 0), redText.c_str()); // shadow
+            drawList->AddText(ImVec2(x, y), ImColor(255, 0, 0), redText.c_str());
+
+            // 2. draw middle white text
+            drawList->AddText(ImVec2(x + redSize.x + 1, y + 1), ImColor(0, 0, 0), middleBuffer); // shadow
+            drawList->AddText(ImVec2(x + redSize.x, y), ImColor(255, 255, 255), middleBuffer);
+
+            // 3. draw rainbow names
+            drawList->AddText(ImVec2(x + redSize.x + midSize.x + 1, y + 1), ImColor(0, 0, 0), rainbowText.c_str()); // shadow
+            drawList->AddText(ImVec2(x + redSize.x + midSize.x, y), rainbowColor, rainbowText.c_str());
         }
         if (!vars::bEspEnabled || !vars::pMainCamera) return;//Global Master Switch & Safety Checks
         if (!hooks::oGetTransform || !hooks::oGetPosition) return;// Ensure we have the basic Unity functions needed
